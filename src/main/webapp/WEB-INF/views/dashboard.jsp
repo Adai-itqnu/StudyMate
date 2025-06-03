@@ -188,9 +188,9 @@
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                            <img src="${pageContext.request.contextPath}/resources/img/${not empty user.avatar ? user.avatar : 'avatar-placeholder.png'}" 
+                            <img src="${pageContext.request.contextPath}/resources/img/avatar.png"
                                  alt="Avatar" class="user-avatar me-2" 
-                                 onerror="this.src='${pageContext.request.contextPath}/resources/img/avatar-placeholder.png';">
+                                 onerror="this.src='${pageContext.request.contextPath}/resources/img/avatar.png';">
                             ${user.fullName}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
@@ -229,9 +229,9 @@
                         <c:when test="${not empty suggestedUsers}">
                             <c:forEach var="suggestedUser" items="${suggestedUsers}">
                                 <div class="user-item">
-                                    <img src="${pageContext.request.contextPath}/resources/img/${not empty suggestedUser.avatar ? suggestedUser.avatar : 'avatar-placeholder.png'}" 
+                                    <img src="${pageContext.request.contextPath}/resources/img/avatar.png"
                                          class="user-item-avatar" alt="User"
-                                         onerror="this.src='${pageContext.request.contextPath}/resources/img/avatar-placeholder.png';">
+                                         onerror="this.src='${pageContext.request.contextPath}/resources/img/avatar.png';">
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
@@ -239,7 +239,7 @@
                                                 <small class="user-item-username">@${suggestedUser.username}</small>
                                             </div>
                                             <button class="btn btn-sm btn-outline-primary" 
-                                                    onclick="followUser(${suggestedUser.id}, this)">
+       	                                          onclick="followUser(${suggestedUser.id}, this)">
                                                 Theo dõi
                                             </button>
                                         </div>
@@ -292,9 +292,9 @@
                         <c:forEach var="post" items="${posts}">
                             <div class="post-card bg-white">
                                 <div class="post-header">
-                                    <img src="${pageContext.request.contextPath}/resources/img/${not empty post.user.avatar ? post.user.avatar : 'avatar-placeholder.png'}" 
+                                    <img src="${pageContext.request.contextPath}/resources/img/avatar.png"
                                          class="post-avatar" alt="User"
-                                         onerror="this.src='${pageContext.request.contextPath}/resources/img/avatar-placeholder.png';">
+                                         onerror="this.src='${pageContext.request.contextPath}/resources/img/avatar.png';">
                                     <div>
                                         <p class="post-user">${post.user.fullName}</p>
                                         <small class="post-time">${post.formattedCreatedAt}</small>
