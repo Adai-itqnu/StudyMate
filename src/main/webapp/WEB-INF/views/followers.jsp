@@ -1,0 +1,31 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<html>
+<head>
+    <title>Danh sách người theo dõi</title>
+    <link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            Danh sách người theo dõi
+        </div>
+        <div class="card-body">
+            <c:if test="${not empty followers}">
+                <ul class="list-group">
+                    <c:forEach var="follower" items="${followers}">
+                        <li class="list-group-item">${follower.fullName} (${follower.username})</li>
+                    </c:forEach>
+                </ul>
+            </c:if>
+            <c:if test="${empty followers}">
+                <p>Chưa có ai theo dõi bạn.</p>
+            </c:if>
+            <a href="${pageContext.request.contextPath}/user/dashboard" class="btn btn-secondary mt-2">Quay lại</a>
+        </div>
+    </div>
+</div>
+<script src="${pageContext.request.contextPath}/resources/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
