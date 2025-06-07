@@ -40,18 +40,39 @@ public class User {
     public void setUsername(String username) { this.username = username; }
 
     public String getPassword() { return password; }
+    
     public void setPassword(String password) { 
-        this.password = BCrypt.hashpw(password, BCrypt.gensalt()); 
+        if (password != null && !password.trim().isEmpty()) {
+            // Chỉ hash nếu password chưa được hash (không bắt đầu bằng $2a$)
+            if (!password.startsWith("$2a$")) {
+                this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+            } else {
+                this.password = password; // Đã được hash rồi
+            }
+        }
+    }
+    
+    // Method để set password đã được hash sẵn (dùng khi load từ DB)
+    public void setHashedPassword(String hashedPassword) {
+        this.password = hashedPassword;
     }
     
     // Static method to check password (since the original one required an instance)
     public static boolean checkPassword(String plainPassword, String hashedPassword) {
-        return BCrypt.checkpw(plainPassword, hashedPassword);
+        if (plainPassword == null || hashedPassword == null) {
+            return false;
+        }
+        try {
+            return BCrypt.checkpw(plainPassword, hashedPassword);
+        } catch (Exception e) {
+            System.err.println("Error checking password: " + e.getMessage());
+            return false;
+        }
     }
     
     // Instance method to check password 
     public boolean checkPassword(String plainPassword) {
-        return BCrypt.checkpw(plainPassword, this.password);
+        return checkPassword(plainPassword, this.password);
     }
 
     public String getEmail() { return email; }

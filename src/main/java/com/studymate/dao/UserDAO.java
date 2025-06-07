@@ -32,14 +32,24 @@ public class UserDAO {
                 return false; // Email đã tồn tại
             }
             
-            // Thêm người dùng mới
-            String sql = "INSERT INTO users (full_name, username, password, email, role) VALUES (?, ?, ?, ?, ?)";
+            // Thêm người dùng mới với đầy đủ các trường
+            String sql = "INSERT INTO users (full_name, username, password, email, phone, date_of_birth, role) VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, user.getFullName());
             stmt.setString(2, user.getUsername());
             stmt.setString(3, user.getPassword()); // Password đã được hash trong model User.java
             stmt.setString(4, user.getEmail());
-            stmt.setString(5, user.getRole() == null ? "STUDENT" : user.getRole());
+            stmt.setString(5, user.getPhone()); // Thêm số điện thoại
+            
+            // Xử lý ngày sinh
+            if (user.getDateOfBirth() != null) {
+                stmt.setDate(6, new java.sql.Date(user.getDateOfBirth().getTime()));
+            } else {
+                stmt.setNull(6, Types.DATE);
+            }
+            
+            stmt.setString(7, user.getRole() == null ? "STUDENT" : user.getRole());
+            
             int row = stmt.executeUpdate();
             return row > 0;
         } catch (Exception e) {
@@ -62,6 +72,14 @@ public class UserDAO {
                     user.setUsername(rs.getString("username"));
                     user.setFullName(rs.getString("full_name"));
                     user.setEmail(rs.getString("email"));
+                    user.setPhone(rs.getString("phone")); // Thêm phone
+                    
+                    // Xử lý date_of_birth
+                    Date dateOfBirth = rs.getDate("date_of_birth");
+                    if (dateOfBirth != null) {
+                        user.setDateOfBirth(new java.util.Date(dateOfBirth.getTime()));
+                    }
+                    
                     user.setRole(rs.getString("role"));
                     user.setBio(rs.getString("bio"));
                     user.setAvatar(rs.getString("avatar"));
@@ -87,6 +105,45 @@ public class UserDAO {
                 user.setUsername(rs.getString("username"));
                 user.setFullName(rs.getString("full_name"));
                 user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getString("phone")); // Thêm phone
+                
+                // Xử lý date_of_birth
+                Date dateOfBirth = rs.getDate("date_of_birth");
+                if (dateOfBirth != null) {
+                    user.setDateOfBirth(new java.util.Date(dateOfBirth.getTime()));
+                }
+                
+                user.setRole(rs.getString("role"));
+                user.setBio(rs.getString("bio"));
+                user.setAvatar(rs.getString("avatar"));
+                user.setSchool(rs.getString("school"));
+                return user;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public User getUserByUsername(String username) {
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "SELECT * FROM users WHERE username = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getString("phone"));
+                
+                Date dateOfBirth = rs.getDate("date_of_birth");
+                if (dateOfBirth != null) {
+                    user.setDateOfBirth(new java.util.Date(dateOfBirth.getTime()));
+                }
+                
                 user.setRole(rs.getString("role"));
                 user.setBio(rs.getString("bio"));
                 user.setAvatar(rs.getString("avatar"));
@@ -153,6 +210,13 @@ public class UserDAO {
                 user.setUsername(rs.getString("username"));
                 user.setFullName(rs.getString("full_name"));
                 user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getString("phone"));
+                
+                Date dateOfBirth = rs.getDate("date_of_birth");
+                if (dateOfBirth != null) {
+                    user.setDateOfBirth(new java.util.Date(dateOfBirth.getTime()));
+                }
+                
                 user.setAvatar(rs.getString("avatar"));
                 followers.add(user);
             }
@@ -177,6 +241,13 @@ public class UserDAO {
                 user.setUsername(rs.getString("username"));
                 user.setFullName(rs.getString("full_name"));
                 user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getString("phone"));
+                
+                Date dateOfBirth = rs.getDate("date_of_birth");
+                if (dateOfBirth != null) {
+                    user.setDateOfBirth(new java.util.Date(dateOfBirth.getTime()));
+                }
+                
                 user.setAvatar(rs.getString("avatar"));
                 following.add(user);
             }
@@ -217,6 +288,13 @@ public class UserDAO {
                 user.setUsername(rs.getString("username"));
                 user.setFullName(rs.getString("full_name"));
                 user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getString("phone"));
+                
+                Date dateOfBirth = rs.getDate("date_of_birth");
+                if (dateOfBirth != null) {
+                    user.setDateOfBirth(new java.util.Date(dateOfBirth.getTime()));
+                }
+                
                 user.setAvatar(rs.getString("avatar"));
                 users.add(user);
             }
