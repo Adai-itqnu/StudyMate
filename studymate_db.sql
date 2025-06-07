@@ -8,7 +8,7 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    role ENUM('STUDENT', 'ADMIN') DEFAULT 'STUDENT',
+    role ENUM('USER', 'ADMIN') DEFAULT 'USER',
     avatar VARCHAR(255),
     bio TEXT,
     phone VARCHAR(20),
@@ -24,7 +24,7 @@ CREATE TABLE users (
 CREATE TABLE system_admins (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
-    admin_level ENUM('SUPER_ADMIN', 'ADMIN') NOT NULL,
+    admin_level ENUM('ADMIN') NOT NULL,
     last_login DATETIME,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -128,7 +128,31 @@ CREATE TABLE system_reports (
     FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (handled_by) REFERENCES system_admins(id) ON DELETE SET NULL
 );
+-- Bảng study_schedules: Lịch học
+CREATE TABLE study_schedules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    subject_id INT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE SET NULL
+);
 
+-- Bảng user_follows: Theo dõi người dùng
+CREATE TABLE user_follows (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    follower_id INT NOT NULL COMMENT 'Người theo dõi',
+    following_id INT NOT NULL COMMENT 'Người được theo dõi',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (following_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_follow (follower_id, following_id)
+);
 
 -- Tạo tài khoản admin
 INSERT INTO users (full_name, username, password, email, role, status, is_system_admin)
@@ -145,9 +169,9 @@ VALUES (
 -- Thêm người dùng
 INSERT INTO users (full_name, username, password, email, role, status, is_system_admin)
 VALUES
-('Nguyễn Văn A', 'nguyenvana', '$2a$10$abcabcabcabcabcabcabcuJFt2', 'vana@example.com', 'STUDENT', 'ACTIVE', FALSE),
-('Trần Thị B', 'tranthib', '$2a$10$abcabcabcabcabcabcabcuJFt2', 'thib@example.com', 'STUDENT', 'ACTIVE', FALSE),
-('Lê Văn C', 'levanc', '$2a$10$abcabcabcabcabcabcabcuJFt2', 'vanc@example.com', 'STUDENT', 'ACTIVE', FALSE);
+('Nguyễn Văn A', 'nguyenvana', '$2a$10$abcabcabcabcabcabcabcuJFt2', 'vana@example.com', 'USER', 'ACTIVE', FALSE),
+('Trần Thị B', 'tranthib', '$2a$10$abcabcabcabcabcabcabcuJFt2', 'thib@example.com', 'USER', 'ACTIVE', FALSE),
+('Lê Văn C', 'levanc', '$2a$10$abcabcabcabcabcabcabcuJFt2', 'vanc@example.com', 'USER', 'ACTIVE', FALSE);
 
 -- Thêm môn học
 INSERT INTO subjects (subject_name, description)
@@ -195,3 +219,7 @@ INSERT INTO system_reports (reporter_id, report_type, target_id, target_type, re
 VALUES
 (1, 'CONTENT_VIOLATION', 3, 'post', 'Nội dung bài viết không phù hợp', NULL, 'PENDING'),
 (2, 'USER_VIOLATION', 3, 'user', 'Người dùng có hành vi spam', NULL, 'IN_REVIEW');
+
+
+
+select * from users
