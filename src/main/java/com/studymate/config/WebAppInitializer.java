@@ -1,19 +1,22 @@
+// src/main/java/com/studymate/config/WebAppInitializer.java
 package com.studymate.config;
 
-import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import jakarta.servlet.Filter;
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.ServletRegistration;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
-    @Override
+	@Override
     protected Class<?>[] getRootConfigClasses() {
-        return null; // Không cần root config riêng
+        return new Class[] { AppConfig.class };
     }
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[] { AppConfig.class }; // Sử dụng AppConfig cho servlet
+        return null;
     }
 
     @Override
