@@ -1,140 +1,115 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<!DOCTYPE html>
-<html lang="vi">
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>StudyMate - Nền tảng học tập thông minh</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="${pageContext.request.contextPath}/resources/css/index.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet"/>
+    <style>
+        .hero-section {
+            background-color: #f8f9fa;
+            padding: 80px 0;
+            margin-bottom: 40px;
+        }
+        .feature-box {
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .navbar-nav {
+            margin-left: auto;
+        }
+        .nav-item{
+        	margin-left: 5px;
+        }
+        .navbar-brand{
+        	
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="#" class="logo">StudyMate</a>
-            <div class="nav-links">
-                <a href="${pageContext.request.contextPath}/dashboard" class="nav-link">Trang chủ</a>
-                <a href="#features" class="nav-link">Tính năng</a>
-                <a href="#" class="nav-link">Hỗ trợ</a>
-                <a href="${pageContext.request.contextPath}/user/login" class="btn-outline">Đăng nhập</a>
-                <a href="${pageContext.request.contextPath}/user/register" class="btn-primary">Đăng ký ngay</a>
+    <!-- Thanh điều hướng -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-success" href="${pageContext.request.contextPath}/">StudyMate</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="btn btn-outline-success" href="${pageContext.request.contextPath}/user/login">Đăng nhập</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-success" href="${pageContext.request.contextPath}/user/register">Đăng ký ngay</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        
-        <div class="hero-container">
-            <div class="hero-content">
-                <h1>Quản lý học tập <span class="highlight">hiệu quả</span> cùng StudyMate</h1>
-                <p>Nền tảng học tập thông minh giúp học sinh, sinh viên quản lý quá trình học tập một cách khoa học. Tạo môn học, đặt mục tiêu, viết ghi chú và kết nối với cộng đồng học tập.</p>
-                
-                <div class="hero-cta">
-                    <a href="#" class="btn-primary">Bắt đầu ngay</a>
-                    <a href="#" class="btn-outline">Tìm hiểu thêm</a>
+    <!-- Phần hero -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Quản lý học tập hiệu quả</h1>
+                    <p class="lead mb-4">
+                        StudyMate là một website giúp người dùng (đặc biệt là học sinh, sinh viên) quản lý quá trình học tập một cách khoa học và hiệu quả.
+                         Người dùng có thể tự tạo các môn học, lên mục tiêu học tập, viết ghi chú học tập và có thể hỏi đáp với mọi người nếu gặp những vấn đề khó khăn trong quá trình học tập.
+                         
+                    </p> 
+                    
+                    <p class="lead mb-5">
+                       Mục tiêu của StudyMate là xây dựng một không gian học tập thông minh, linh hoạt và kết nối – nơi người học không chỉ tiếp thu kiến thức mà còn được truyền cảm hứng để học tốt hơn mỗi ngày.         
+                    </p> 
+                    
                 </div>
-
-                <div class="stats">
-                    <div class="stat-item">
-                        <span class="stat-number">10K+</span>
-                        <span class="stat-label">Học viên</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">500+</span>
-                        <span class="stat-label">Môn học</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">50K+</span>
-                        <span class="stat-label">Ghi chú</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="hero-visual">
-                <div class="main-visual">
-                    📚 StudyMate
-                </div>
-                
-                <div class="floating-card card-1">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 30px; height: 30px; background: #8B5CF6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">📝</div>
-                        <div>
-                            <strong>Ghi chú mới</strong>
-                            <div style="font-size: 0.8rem; color: #666;">Toán học - Đạo hàm</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="floating-card card-2">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 30px; height: 30px; background: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
-                        <div>
-                            <strong>Hoàn thành</strong>
-                            <div style="font-size: 0.8rem; color: #666;">Bài tập Vật lý</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="floating-card card-3">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 30px; height: 30px; background: #F59E0B; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">💬</div>
-                        <div>
-                            <strong>3 câu hỏi mới</strong>
-                            <div style="font-size: 0.8rem; color: #666;">Cộng đồng</div>
-                        </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="text-center">
+                        <img src="${pageContext.request.contextPath}/resources/img/study.png" alt="Học tập" class="img-fluid" onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/resources/img/study.png';" style="max-height: 400px;">
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="features-container">
-            <div class="section-title">
-                <h2>Tính năng nổi bật</h2>
-                <p>Khám phá những công cụ mạnh mẽ giúp bạn học tập hiệu quả hơn</p>
+    <!-- Các tính năng -->
+    <div class="container mb-5">
+        <h2 class="text-center mb-5">Tính năng nổi bật</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-box bg-light">
+                    <h4 class="mb-3">Quản lý môn học</h4>
+                    <p>Tạo và quản lý các môn học, lịch học, và tài liệu học tập một cách thuận tiện.</p>
+                </div>
             </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">📚</div>
-                    <h3>Quản lý môn học</h3>
-                    <p>Tạo và quản lý các môn học, lịch học, và tài liệu học tập một cách thuận tiện. Theo dõi tiến độ học tập và đặt mục tiêu cụ thể.</p>
+            <div class="col-md-4">
+                <div class="feature-box bg-light">
+                    <h4 class="mb-3">Viết ghi chú học tập</h4>
+                    <p>Lưu trữ ý tưởng hoặc kiến thức quan trọng để ôn tập và chia sẻ với mọi người dễ dàng.</p>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">📝</div>
-                    <h3>Ghi chú thông minh</h3>
-                    <p>Lưu trữ ý tưởng và kiến thức quan trọng với công cụ ghi chú hiện đại. Tổ chức, tìm kiếm và chia sẻ ghi chú dễ dàng.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">💬</div>
-                    <h3>Cộng đồng học tập</h3>
-                    <p>Kết nối và trao đổi với cộng đồng học tập. Đặt câu hỏi, thảo luận và giải đáp những vấn đề khó khăn cùng nhau.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box bg-light">
+                    <h4 class="mb-3">Trao đổi học tập</h4>
+                    <p>Tạo ra một cộng đồng cùng nhau bàn luận về 1 chủ đề khó khăn mà bạn mắc phải</p>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <h3>StudyMate</h3>
-            <p>Nền tảng quản lý học tập hiệu quả - Xây dựng không gian học tập thông minh và kết nối</p>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2025 StudyMate. All rights reserved.</p>
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>StudyMate</h5>
+                    <p>Nền tảng quản lý học tập hiệu quả.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2025 StudyMate. All rights reserved.</p>
+                </div>
             </div>
         </div>
     </footer>
+
+    <script src="${pageContext.request.contextPath}/resources/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

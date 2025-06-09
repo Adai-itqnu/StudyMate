@@ -16,6 +16,7 @@ CREATE TABLE subjects (
 -- Bảng users
 CREATE TABLE users (
     user_id         INT AUTO_INCREMENT PRIMARY KEY,
+    fullname		VARCHAR(50) NOT NULL,
     username        VARCHAR(50)  NOT NULL,
     password        VARCHAR(255) NOT NULL,
     role            ENUM('USER','ADMIN') DEFAULT 'USER',
@@ -134,6 +135,16 @@ CREATE TABLE rooms (
     room_id    INT AUTO_INCREMENT PRIMARY KEY,
     name       VARCHAR(100) NOT NULL UNIQUE,     -- ví dụ: "P101", "Lab A"
     location   VARCHAR(255)                       -- tùy chọn: mô tả vị trí, tòa nhà...
+);
+
+CREATE TABLE documents (
+  document_id INT AUTO_INCREMENT PRIMARY KEY,
+  uploader_id INT NOT NULL,
+  title       VARCHAR(255),
+  description TEXT,
+  file_url    VARCHAR(500) NOT NULL,
+  uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (uploader_id) REFERENCES users(user_id)
 );
 
 -- Bảng schedules (thời khóa biểu) sau khi thêm room_id
