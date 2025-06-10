@@ -65,6 +65,7 @@
         <!-- Form đăng bài mới -->
         <div class="card mb-4">
           <div class="card-body">
+          
             <form action="<c:url value='/posts/create'/>" method="post" enctype="multipart/form-data">
               <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}"/>
               <div class="mb-3">
