@@ -63,31 +63,35 @@
       <!-- Cột giữa -->
       <div class="col-md-6">
         <!-- Form đăng bài mới -->
-        <div class="card mb-4">
-          <div class="card-body">
-          
-            <form action="<c:url value='/posts/create'/>" method="post" enctype="multipart/form-data">
-              <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}"/>
-              <div class="mb-3">
-                <input type="text" name="title" class="form-control" placeholder="Tiêu đề" required/>
-              </div>
-              <div class="mb-3">
-                <textarea name="body" class="form-control" rows="3" placeholder="Bạn đang nghĩ gì?" required></textarea>
-              </div>
-              <div class="mb-3">
-                <input type="file" name="attachment" class="form-control"/>
-              </div>
-              <div class="d-flex justify-content-between">
-                <select name="privacy" class="form-select w-auto">
-                  <option value="PUBLIC">Công khai</option>
-                  <option value="FOLLOWERS">Chỉ người theo dõi</option>
-                  <option value="PRIVATE">Chỉ mình tôi</option>
-                </select>
-                <button type="submit" class="btn btn-primary">Đăng</button>
-              </div>
-            </form>
+         <div class="container mt-4">
+    <div class="card mb-4">
+      <div class="card-body">
+        <form action="<c:url value='/posts/create'/>" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="csrfToken" value="${csrfToken}"/>
+          <div class="mb-3">
+            <input type="text" name="title" class="form-control" placeholder="Tiêu đề" required/>
           </div>
-        </div>
+          <div class="mb-3">
+            <textarea name="body" class="form-control" rows="3" placeholder="Bạn đang nghĩ gì?" required></textarea>
+          </div>
+          <div class="mb-3">
+            <input type="file" name="attachment" class="form-control"/>
+          </div>
+          <div class="d-flex justify-content-between">
+            <select name="privacy" class="form-select w-auto">
+              <option value="PUBLIC">Công khai</option>
+              <option value="FOLLOWERS">Chỉ người theo dõi</option>
+              <option value="PRIVATE">Chỉ mình tôi</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Đăng</button>
+          </div>
+        </form>
+        <c:if test="${not empty error}">
+          <div class="alert alert-danger mt-2">${error}</div>
+        </c:if>
+      </div>
+    </div>
+  </div>
 
         <!-- Danh sách bài viết -->
         <c:forEach var="p" items="${posts}">

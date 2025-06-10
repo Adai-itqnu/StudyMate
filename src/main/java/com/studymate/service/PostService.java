@@ -3,6 +3,8 @@ package com.studymate.service;
 import com.studymate.model.Post;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public interface PostService {
     /**
      * Lấy danh sách tất cả bài viết
@@ -13,4 +15,8 @@ public interface PostService {
      * Xóa bài viết theo ID
      */
     boolean delete(int postId) throws Exception;
+    
+    List<Post> search(String keyword) throws Exception;
+    
+    int create(Post post, MultipartFile attachment) throws Exception;
 }
