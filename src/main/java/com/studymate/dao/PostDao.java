@@ -8,4 +8,6 @@ public interface PostDao {
     List<Post> findAll() throws Exception;
     /** Xóa bài viết theo ID */
     boolean delete(int postId) throws Exception;
+    // Search bài viết
+    List<Post> search(String keyword) throws Exception;
 }

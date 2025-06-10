@@ -1,4 +1,4 @@
-package com.studymate.dao;
+package com.studymate.dao.impl;
 
 import com.studymate.dao.PostDao;
 import com.studymate.model.Post;
@@ -10,6 +10,7 @@ import java.util.List;
 
 public class PostDaoImpl implements PostDao {
     private static final String SELECT_ALL = "SELECT * FROM posts ORDER BY created_at DESC";
+    private static final String SEARCH_SQL = "SELECT * FROM posts WHERE LOWER(title) LIKE ? OR LOWER(body) LIKE ? ORDER BY created_at DESC";
     private static final String DELETE_BY_ID = "DELETE FROM posts WHERE post_id = ?";
 
     @Override
@@ -26,6 +27,23 @@ public class PostDaoImpl implements PostDao {
     }
 
     @Override
+    public List<Post> search(String keyword) throws Exception {
+        List<Post> list = new ArrayList<>();
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SEARCH_SQL)) {
+            String kw = "%" + keyword.toLowerCase() + "%";
+            ps.setString(1, kw);
+            ps.setString(2, kw);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        }
+        return list;
+    }
+
+    @Override
     public boolean delete(int postId) throws Exception {
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(DELETE_BY_ID)) {
@@ -34,7 +52,6 @@ public class PostDaoImpl implements PostDao {
         }
     }
 
-    /** Ánh xạ ResultSet thành Post */
     private Post mapRow(ResultSet rs) throws SQLException {
         Post p = new Post();
         p.setPostId(rs.getInt("post_id"));

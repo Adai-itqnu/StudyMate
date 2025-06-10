@@ -1,7 +1,7 @@
-package com.studymate.service;
+package com.studymate.service.impl;
 
 import com.studymate.dao.PostDao;
-import com.studymate.dao.PostDaoImpl;
+import com.studymate.dao.impl.PostDaoImpl;
 import com.studymate.model.Post;
 import com.studymate.service.PostService;
 import java.util.List;

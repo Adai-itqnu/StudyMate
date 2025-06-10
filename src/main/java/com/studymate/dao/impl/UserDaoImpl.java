@@ -1,4 +1,4 @@
-package com.studymate.dao;
+package com.studymate.dao.impl;
 
 import com.studymate.dao.UserDao;
 import com.studymate.model.User;

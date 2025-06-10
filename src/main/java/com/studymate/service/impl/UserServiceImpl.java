@@ -1,7 +1,7 @@
-package com.studymate.service;
+package com.studymate.service.impl;
 
 import com.studymate.dao.UserDao;
-import com.studymate.dao.UserDaoImpl;
+import com.studymate.dao.impl.UserDaoImpl;
 import com.studymate.model.User;
 import com.studymate.service.UserService;
 import com.studymate.util.PasswordUtil;

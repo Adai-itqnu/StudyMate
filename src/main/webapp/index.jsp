@@ -34,10 +34,10 @@
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="btn btn-outline-success" href="${pageContext.request.contextPath}/user/login">Đăng nhập</a>
+                        <a class="btn btn-outline-success" href="${pageContext.request.contextPath}/login">Đăng nhập</a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-outline-success" href="${pageContext.request.contextPath}/user/register">Đăng ký ngay</a>
+                        <a class="btn btn-outline-success" href="${pageContext.request.contextPath}/register">Đăng ký ngay</a>
                     </li>
                 </ul>
             </div>

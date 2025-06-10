@@ -1,4 +1,4 @@
-package com.studymate.dao;
+package com.studymate.dao.impl;
 
 import com.studymate.dao.ReportDao;
 import com.studymate.model.Report;

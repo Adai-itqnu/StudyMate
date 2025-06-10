@@ -1,7 +1,7 @@
-package com.studymate.service;
+package com.studymate.service.impl;
 
 import com.studymate.dao.ReportDao;
-import com.studymate.dao.ReportDaoImpl;
+import com.studymate.dao.impl.ReportDaoImpl;
 import com.studymate.model.Report;
 import com.studymate.service.ReportService;
 import java.util.List;

@@ -2,13 +2,13 @@ package com.studymate.controller;
 
 import com.studymate.model.User;
 import com.studymate.service.UserService;
-import com.studymate.service.UserServiceImpl;
+import com.studymate.service.impl.UserServiceImpl;
 import com.studymate.model.Post;
 import com.studymate.service.PostService;
-import com.studymate.service.PostServiceImpl;
+import com.studymate.service.impl.PostServiceImpl;
 import com.studymate.model.Report;
 import com.studymate.service.ReportService;
-import com.studymate.service.ReportServiceImpl;
+import com.studymate.service.impl.ReportServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;

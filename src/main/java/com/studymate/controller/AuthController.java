@@ -2,7 +2,7 @@ package com.studymate.controller;
 
 import com.studymate.model.User;
 import com.studymate.service.UserService;
-import com.studymate.service.UserServiceImpl;
+import com.studymate.service.impl.UserServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -97,7 +97,7 @@ public class AuthController {
               // 2. Tạo session mới
               HttpSession newSession = request.getSession(true);
               newSession.setAttribute("currentUser", u);
-              return "redirect:/";
+              return "redirect:/dashboard";
           } else {
               model.addAttribute("error", "Sai email hoặc mật khẩu");
               // Lấy lại token CSRF để hiển thị form
