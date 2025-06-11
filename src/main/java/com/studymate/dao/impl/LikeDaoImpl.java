@@ -9,7 +9,7 @@ public class LikeDaoImpl implements LikeDao {
     private static final String INSERT_SQL = "INSERT INTO likes (user_id, post_id) VALUES (?, ?)";
     private static final String DELETE_SQL = "DELETE FROM likes WHERE user_id=? AND post_id=?";
     private static final String COUNT_SQL  = "SELECT COUNT(*) FROM likes WHERE post_id=?";
-
+    private static final String DELETE_BY_POST = "DELETE FROM likes WHERE post_id = ?";
     @Override
     public boolean create(int userId, int postId) throws Exception {
         try (Connection conn = DBConnectionUtil.getConnection();
@@ -40,4 +40,24 @@ public class LikeDaoImpl implements LikeDao {
             }
         }
     }
+
+    @Override
+    public int countByPostId(int pid) {
+        try {
+            return countByPost(pid);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    
+    @Override
+    public boolean deleteByPostId(int postId) throws Exception {
+      try (Connection conn = DBConnectionUtil.getConnection();
+           PreparedStatement ps = conn.prepareStatement(DELETE_BY_POST)) {
+        ps.setInt(1, postId);
+        return ps.executeUpdate() > 0;
+      }
+    }
+   
 }

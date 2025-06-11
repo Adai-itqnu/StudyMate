@@ -25,8 +25,8 @@ public class SearchServiceImpl implements SearchService {
             .collect(Collectors.toList());
     }
 
-    @Override
-    public List<Post> searchPosts(String keyword) throws Exception {
-        return postDao.search(keyword);  // cần bổ sung search() trong PostDaoImpl
-    }
+//    @Override
+//    public List<Post> searchPosts(String keyword) throws Exception {
+//       // return postDao.search(keyword);
+//    }
 }

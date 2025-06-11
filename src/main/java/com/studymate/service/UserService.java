@@ -19,4 +19,19 @@ public interface UserService {
      * Lấy danh sách tất cả user (dùng cho admin)
      */
     List<User> findAll() throws Exception;
+
+    /**
+     * Tìm user theo ID
+     */
+    User findById(int userId) throws Exception;
+
+    /**
+     * Cập nhật thông tin user
+     */
+    boolean updateUser(User user) throws Exception;
+
+    /**
+     * Cập nhật mật khẩu user
+     */
+    boolean updatePassword(int userId, String oldPassword, String newPassword) throws Exception;
 }

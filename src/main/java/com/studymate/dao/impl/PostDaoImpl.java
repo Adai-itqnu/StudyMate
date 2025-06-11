@@ -9,9 +9,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PostDaoImpl implements PostDao {
-    private static final String SELECT_ALL = "SELECT * FROM posts ORDER BY created_at DESC";
-    private static final String SEARCH_SQL = "SELECT * FROM posts WHERE LOWER(title) LIKE ? OR LOWER(body) LIKE ? ORDER BY created_at DESC";
-    private static final String DELETE_BY_ID = "DELETE FROM posts WHERE post_id = ?";
+    private static final String INSERT_SQL =
+      "INSERT INTO posts (user_id, title, body, privacy, status) VALUES (?,?,?,?, 'PUBLISHED')";
+    private static final String SELECT_ALL =
+      "SELECT * FROM posts ORDER BY created_at DESC";
+
+    @Override
+    public int create(Post post) throws Exception {
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                 INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, post.getUserId());
+            ps.setString(2, post.getTitle());
+            ps.setString(3, post.getBody());
+            ps.setString(4, post.getPrivacy());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                return rs.next() ? rs.getInt(1) : -1;
+            }
+        }
+    }
 
     @Override
     public List<Post> findAll() throws Exception {
@@ -20,48 +37,17 @@ public class PostDaoImpl implements PostDao {
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                list.add(mapRow(rs));
+                Post p = new Post();
+                p.setPostId(rs.getInt("post_id"));
+                p.setUserId(rs.getInt("user_id"));
+                p.setTitle(rs.getString("title"));
+                p.setBody(rs.getString("body"));
+                p.setPrivacy(rs.getString("privacy"));
+                p.setStatus(rs.getString("status"));
+                p.setCreatedAt(rs.getTimestamp("created_at"));
+                list.add(p);
             }
         }
         return list;
-    }
-
-    @Override
-    public List<Post> search(String keyword) throws Exception {
-        List<Post> list = new ArrayList<>();
-        try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SEARCH_SQL)) {
-            String kw = "%" + keyword.toLowerCase() + "%";
-            ps.setString(1, kw);
-            ps.setString(2, kw);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
-            }
-        }
-        return list;
-    }
-
-    @Override
-    public boolean delete(int postId) throws Exception {
-        try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(DELETE_BY_ID)) {
-            ps.setInt(1, postId);
-            return ps.executeUpdate() > 0;
-        }
-    }
-
-    private Post mapRow(ResultSet rs) throws SQLException {
-        Post p = new Post();
-        p.setPostId(rs.getInt("post_id"));
-        p.setUserId(rs.getInt("user_id"));
-        p.setTitle(rs.getString("title"));
-        p.setBody(rs.getString("body"));
-        p.setPrivacy(rs.getString("privacy"));
-        p.setStatus(rs.getString("status"));
-        p.setCreatedAt(rs.getTimestamp("created_at"));
-        p.setUpdatedAt(rs.getTimestamp("updated_at"));
-        return p;
     }
 }

@@ -1,214 +1,380 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard – StudyMate</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/assets/css/dashboard.css"/>
-</head>
-<body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
-    <a class="navbar-brand" href="<c:url value='/'/>">StudyMate</a>
-    <form class="d-flex mx-auto" action="<c:url value='/search'/>" method="get">
-      <input class="form-control me-2" name="q" type="search" placeholder="Tìm kiếm bài viết hoặc người dùng"/>
-      <button class="btn btn-outline-success" type="submit">Tìm</button>
-    </form>
-    <div class="dropdown">
-      <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="userMenu" data-bs-toggle="dropdown">
-        <c:choose>
-          <c:when test="${not empty sessionScope.currentUser.avatarUrl}">
-            <img src="${sessionScope.currentUser.avatarUrl}" class="avatar-sm me-2"/>
-          </c:when>
-          <c:otherwise>
-            <img src="<c:url value='/assets/images/default-avatar.png'/>" class="avatar-sm me-2"/>
-          </c:otherwise>
-        </c:choose>
-        <span>${sessionScope.currentUser.fullName}</span>
-      </a>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-        <li><a class="dropdown-item" href="<c:url value='/profile'/>">Trang cá nhân</a></li>
-        <li><a class="dropdown-item" href="<c:url value='/profile/edit'/>">Chỉnh sửa thông tin</a></li>
-        <li><a class="dropdown-item" href="<c:url value='/profile/change-password'/>">Đổi mật khẩu</a></li>
-        <li><hr class="dropdown-divider"/></li>
-        <li><a class="dropdown-item" href="<c:url value='/logout'/>">Đăng xuất</a></li>
-      </ul>
-    </div>
-  </nav>
-
-  <div class="container-fluid mt-4">
-    <div class="row">
-      <!-- Sidebar trái -->
-      <div class="col-md-3 sidebar">
-        <h5>Gợi ý theo dõi</h5>
-        <c:forEach var="u" items="${suggestions}">
-          <div class="d-flex align-items-center mb-2">
-            <img src="${u.avatarUrl}" class="avatar-sm me-2"/>
-            <div>
-              <strong>${u.username}</strong><br/>
-              <small>${u.fullName}</small>
-            </div>
-            <form action="<c:url value='/follow'/>" method="post" class="ms-auto">
-              <input type="hidden" name="userId" value="${u.userId}"/>
-              <button type="submit" class="btn btn-sm btn-primary">Theo dõi</button>
-            </form>
-          </div>
-        </c:forEach>
-      </div>
-
-      <!-- Cột giữa -->
-      <div class="col-md-6">
-        <!-- Form đăng bài mới -->
-         <div class="container mt-4">
-    <div class="card mb-4">
-      <div class="card-body">
-        <form action="<c:url value='/posts/create'/>" method="post" enctype="multipart/form-data">
-          <input type="hidden" name="csrfToken" value="${csrfToken}"/>
-          <div class="mb-3">
-            <input type="text" name="title" class="form-control" placeholder="Tiêu đề" required/>
-          </div>
-          <div class="mb-3">
-            <textarea name="body" class="form-control" rows="3" placeholder="Bạn đang nghĩ gì?" required></textarea>
-          </div>
-          <div class="mb-3">
-            <input type="file" name="attachment" class="form-control"/>
-          </div>
-          <div class="d-flex justify-content-between">
-            <select name="privacy" class="form-select w-auto">
-              <option value="PUBLIC">Công khai</option>
-              <option value="FOLLOWERS">Chỉ người theo dõi</option>
-              <option value="PRIVATE">Chỉ mình tôi</option>
-            </select>
-            <button type="submit" class="btn btn-primary">Đăng</button>
-          </div>
-        </form>
-        <c:if test="${not empty error}">
-          <div class="alert alert-danger mt-2">${error}</div>
-        </c:if>
-      </div>
-    </div>
-  </div>
-
-        <!-- Danh sách bài viết -->
-        <c:forEach var="p" items="${posts}">
-          <div class="card post-card">
-            <div class="card-header d-flex align-items-center">
-              <img src="${p.user.avatarUrl}" class="avatar-sm me-2"/>
-              <div>
-                <strong>${p.user.fullName}</strong><br/>
-                <small class="text-muted"><fmt:formatDate value="${p.createdAt}" pattern="dd/MM/yyyy HH:mm"/></small>
-              </div>
-            </div>
-            <div class="card-body">
-              <h5 class="card-title">${p.title}</h5>
-              <p class="card-text">${p.body}</p>
-              <c:if test="${not empty p.attachments}">
-                <div class="mt-2">
-                  <c:forEach var="att" items="${p.attachments}">
-                    <c:choose>
-                      <c:when test="${att.fileType=='IMAGE'}">
-                        <img src="${att.fileUrl}" class="img-fluid mb-2"/>
-                      </c:when>
-                      <c:otherwise>
-                        <a href="${att.fileUrl}" target="_blank">Tải file</a>
-                      </c:otherwise>
-                    </c:choose>
-                  </c:forEach>
-                </div>
-              </c:if>
-              <!-- Like, comment, share -->
-              <div class="mt-3">
-                <form action="<c:url value='/like'/>" method="post" class="d-inline">
-                  <input type="hidden" name="postId" value="${p.postId}"/>
-                  <button type="submit" class="btn btn-sm btn-outline-primary">
-                    Like (${p.likeCount})
-                  </button>
-                </form>
-                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#comments-${p.postId}">
-                  Bình luận (${p.commentCount})
-                </button>
-                <form action="<c:url value='/share'/>" method="post" class="d-inline ms-2">
-                  <input type="hidden" name="postId" value="${p.postId}"/>
-                  <button type="submit" class="btn btn-sm btn-outline-success">Chia sẻ</button>
-                </form>
-                <!-- Comments collapse -->
-                <div class="collapse mt-2" id="comments-${p.postId}">
-                  <c:forEach var="cmt" items="${p.comments}">
-                    <div class="border p-2 mb-1">
-                      <strong>${cmt.user.fullName}:</strong> ${cmt.content}
-                    </div>
-                  </c:forEach>
-                  <form action="<c:url value='/comment'/>" method="post">
-                    <div class="input-group">
-                      <input type="hidden" name="postId" value="${p.postId}"/>
-                      <input type="text" name="content" class="form-control" placeholder="Viết bình luận" required/>
-                      <button class="btn btn-primary" type="submit">Gửi</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </c:forEach>
-      </div>
-
-      <!-- Sidebar phải -->
-      <div class="col-md-3 sidebar">
-        <h5>Chức năng nhanh</h5>
-        <ul class="list-group">
-          <li class="list-group-item"><a href="<c:url value='/schedule'/>">Thời khóa biểu</a></li>
-          <li class="list-group-item"><a href="<c:url value='/notes'/>">Ghi chú</a></li>
-          <li class="list-group-item"><a href="<c:url value='/tasks'/>">Task</a></li>
-          <li class="list-group-item"><a href="<c:url value='/documents'/>">Tài liệu</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Add smooth scrolling
-        document.addEventListener('DOMContentLoaded', function() {
-            // File upload preview
-            const fileInput = document.getElementById('file-upload');
-            const fileLabel = document.querySelector('.file-upload-label');
-            
-            fileInput.addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    const fileName = e.target.files[0].name;
-                    fileLabel.innerHTML = `<i class="fas fa-check-circle me-2"></i>Đã chọn: ${fileName}`;
-                    fileLabel.style.background = 'rgba(34, 197, 94, 0.2)';
-                    fileLabel.style.borderColor = 'rgba(34, 197, 94, 0.5)';
-                    fileLabel.style.color = '#22c55e';
-                } else {
-                    fileLabel.innerHTML = '<i class="fas fa-cloud-upload-alt me-2"></i>Thêm hình ảnh hoặc tệp đính kèm';
-                    fileLabel.style.background = 'rgba(255,255,255,0.1)';
-                    fileLabel.style.borderColor = 'rgba(255,255,255,0.3)';
-                    fileLabel.style.color = 'rgba(255,255,255,0.7)';
-                }
-            });
-
-            // Add stagger animation to cards
-            const cards = document.querySelectorAll('.glass-card');
-            cards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
-            });
-
-            // Add parallax effect to particles
-            window.addEventListener('scroll', () => {
-                const scrolled = window.pageYOffset;
-                const particles = document.querySelectorAll('.particle');
-                
-                particles.forEach((particle, index) => {
-                    const speed = (index + 1) * 0.5;
-                    particle.style.transform = `translateY(${scrolled * speed}px)`;
-                });
-            });
-        });
-    </script>
-</body>
-</html>
+	<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+	<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+	<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+	<!DOCTYPE html>
+	<html lang="vi">
+	<head>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <title>StudyMate - Trang chủ</title>
+	    <link href="<c:url value='/assets/css/bootstrap.min.css'/>" rel="stylesheet">
+	    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/assets/css/dashboard.css"/>
+	</head>
+	<body>
+	    <!-- Header -->
+	    <div class="header">
+	        <div class="container-fluid">
+	            <div class="row align-items-center py-3">
+	                <!-- Logo/Trang chủ -->
+	                <div class="col-md-3">
+	                    <a href="<c:url value='/dashboard'/>" class="text-decoration-none">
+	                        <h4 class="mb-0 text-primary">
+	                            <i class="fas fa-graduation-cap"></i> StudyMate
+	                        </h4>
+	                    </a>
+	                </div>
+	                
+	                <!-- Ô tìm kiếm -->
+	                <div class="col-md-6">
+	                    <form action="<c:url value='/dashboard'/>" method="get" class="d-flex justify-content-center">
+	                        <div class="input-group search-box">
+	                            <input type="text" name="search" class="form-control" 
+	                                   placeholder="Tìm kiếm người dùng..." 
+	                                   value="${searchKeyword}">
+	                            <button class="btn btn-outline-primary" type="submit">
+	                                <i class="fas fa-search"></i>
+	                            </button>
+	                        </div>
+	                    </form>
+	                </div>
+	                
+	                <!-- User info -->
+	                <div class="col-md-3">
+	                    <div class="d-flex justify-content-end">
+	                        <div class="user-dropdown">
+	                            <div class="d-flex align-items-center cursor-pointer" onclick="toggleDropdown()">
+	                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : '/assets/images/default-avatar.png'}" 
+	                                     alt="Avatar" class="avatar me-2">
+	                                <span class="me-2">${currentUser.fullName}</span>
+	                                <i class="fas fa-chevron-down"></i>
+	                            </div>
+	                            <div class="dropdown-menu" id="userDropdown">
+	                                <a href="<c:url value='/profile'/>" class="dropdown-item">
+	                                    <i class="fas fa-user me-2"></i>Trang cá nhân
+	                                </a>
+	                                <a href="<c:url value='/profile/settings'/>" class="dropdown-item">
+	                                    <i class="fas fa-cog me-2"></i>Chỉnh sửa thông tin
+	                                </a>
+	                                <a href="<c:url value='/logout'/>" class="dropdown-item">
+	                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+	                                </a>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	
+	    <!-- Main Content -->
+	    <div class="container-fluid">
+	        <div class="row">
+	            <!-- Left Sidebar - Gợi ý người dùng -->
+	            <div class="col-md-3">
+	                <div class="sidebar">
+	                    <h5 class="mb-3">
+	                        <i class="fas fa-users"></i> Gợi ý theo dõi
+	                    </h5>
+	                    
+	                    <c:forEach var="suggestion" items="${suggestions}">
+	                        <div class="suggestion-card">
+	                            <div class="d-flex align-items-center">
+	                                <img src="${suggestion.avatarUrl != null ? suggestion.avatarUrl : '/assets/images/default-avatar.png'}" 
+	                                     alt="Avatar" class="avatar me-3">
+	                                <div class="flex-grow-1">
+	                                    <h6 class="mb-1">${suggestion.fullName}</h6>
+	                                    <small class="text-muted">@${suggestion.username}</small>
+	                                </div>
+	                            </div>
+	                            <div class="mt-2">
+	                                <button class="btn btn-primary btn-sm me-2" 
+	                                        onclick="followUser(${suggestion.userId})">
+	                                    <i class="fas fa-plus"></i> Theo dõi
+	                                </button>
+	                                <a href="<c:url value='/profile/${suggestion.userId}'/>" 
+	                                   class="btn btn-outline-secondary btn-sm">
+	                                    Xem trang
+	                                </a>
+	                            </div>
+	                        </div>
+	                    </c:forEach>
+	                </div>
+	            </div>
+	
+	            <!-- Main Content Area -->
+	            <div class="col-md-6">
+	                <div class="main-content">
+	                    <!-- Post Form -->
+	                    <div class="post-form">
+	                        <h5 class="mb-3">
+	                            <i class="fas fa-edit"></i> Chia sẻ bài viết mới
+	                        </h5>
+	                        <form action="<c:url value='/posts/create'/>" method="post" enctype="multipart/form-data">
+	                            <div class="mb-3">
+	                                <input type="text" name="title" class="form-control" 
+	                                       placeholder="Tiêu đề bài viết..." required>
+	                            </div>
+	                            <div class="mb-3">
+	                                <textarea name="body" class="form-control" rows="4" 
+	                                          placeholder="Bạn đang nghĩ gì?" required></textarea>
+	                            </div>
+	                            <div class="row">
+	                                <div class="col-md-6 mb-3">
+	                                    <select name="privacy" class="form-select">
+	                                        <option value="PUBLIC">Công khai</option>
+	                                        <option value="FOLLOWERS">Chỉ người theo dõi</option>
+	                                        <option value="PRIVATE">Chỉ riêng tôi</option>
+	                                    </select>
+	                                </div>
+	                                <div class="col-md-6 mb-3">
+	                                    <input type="file" name="attachment" class="form-control" 
+	                                           accept=".jpg,.jpeg,.png">
+	                                </div>
+	                            </div>
+	                            <button type="submit" class="btn btn-primary">
+	                                <i class="fas fa-paper-plane"></i> Đăng bài
+	                            </button>
+	                        </form>
+	                    </div>
+	
+	                    <!-- Posts List -->
+	                    <c:if test="${not empty posts}">
+	                        <c:forEach var="post" items="${posts}">
+	                            <div class="post-card">
+	                                <div class="d-flex align-items-center mb-3">
+	                                    <img src="/assets/images/default-avatar.png" alt="Avatar" class="avatar me-3">
+	                                    <div>
+	                                        <h6 class="mb-0">User ${post.userId}</h6>
+	                                        <small class="text-muted">
+	                                            <fmt:formatDate value="${post.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+	                                        </small>
+	                                    </div>
+	                                    <div class="ms-auto">
+	                                        <span class="badge bg-secondary">${post.privacy}</span>
+	                                    </div>
+	                                </div>
+	                                
+	                                <h5 class="mb-2">${post.title}</h5>
+	                                <p class="mb-3">${post.body}</p>
+	                                
+	                                <!-- Attachments -->
+	                                <c:if test="${not empty post.attachments}">
+	                                    <div class="mb-3">
+	                                        <c:forEach var="attachment" items="${post.attachments}">
+	                                            <img src="${attachment.fileUrl}" 
+	                                                 alt="Attachment" 
+	                                                 class="img-fluid rounded" 
+	                                                 style="max-width: 100%; max-height: 300px;">
+	                                        </c:forEach>
+	                                    </div>
+	                                </c:if>
+	                                
+	                                <!-- Post Actions -->
+	                                <div class="d-flex justify-content-between border-top pt-3">
+	                                    <button class="btn btn-outline-primary btn-sm" 
+	                                            onclick="likePost(${post.postId})">
+	                                        <i class="fas fa-heart"></i> Like
+	                                        <span id="like-count-${post.postId}">${post.likeCount}</span>
+	                                    </button>
+	                                    <button class="btn btn-outline-secondary btn-sm">
+	                                        <i class="fas fa-comment"></i> Comment
+	                                        <span>${post.comments != null ? post.comments.size() : 0}</span>
+	                                    </button>
+	                                    <button class="btn btn-outline-success btn-sm" 
+	                                            onclick="sharePost(${post.postId})">
+	                                        <i class="fas fa-share"></i> Share
+	                                        <span>${post.shares != null ? post.shares.size() : 0}</span>
+	                                    </button>
+	                                </div>
+	                            </div>
+	                        </c:forEach>
+	                    </c:if>
+	                    
+	                    <c:if test="${empty posts}">
+	                        <div class="post-card text-center">
+	                            <i class="fas fa-info-circle text-muted fa-3x mb-3"></i>
+	                            <h5>Chưa có bài viết nào</h5>
+	                            <p class="text-muted">Hãy tạo bài viết đầu tiên của bạn!</p>
+	                        </div>
+	                    </c:if>
+	                </div>
+	            </div>
+	
+	            <!-- Right Sidebar - Features -->
+	            <div class="col-md-3">
+	                <div class="right-sidebar">
+	                    <h5 class="mb-3">
+	                        <i class="fas fa-tools"></i> Tính năng
+	                    </h5>
+	                    
+	                    <div class="feature-card" onclick="window.location.href='#'">
+	                        <div class="d-flex align-items-center">
+	                            <i class="fas fa-calendar-alt text-primary fa-2x me-3"></i>
+	                            <div>
+	                                <h6 class="mb-1">Tạo lịch học</h6>
+	                                <small class="text-muted">Lên kế hoạch học tập</small>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="feature-card" onclick="window.location.href='#'">
+	                        <div class="d-flex align-items-center">
+	                            <i class="fas fa-sticky-note text-warning fa-2x me-3"></i>
+	                            <div>
+	                                <h6 class="mb-1">Xem ghi chú</h6>
+	                                <small class="text-muted">Quản lý ghi chú cá nhân</small>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="feature-card" onclick="window.location.href='#'">
+	                        <div class="d-flex align-items-center">
+	                            <i class="fas fa-tasks text-success fa-2x me-3"></i>
+	                            <div>
+	                                <h6 class="mb-1">Xem task</h6>
+	                                <small class="text-muted">Theo dõi công việc</small>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="feature-card" onclick="window.location.href='#'">
+	                        <div class="d-flex align-items-center">
+	                            <i class="fas fa-book text-info fa-2x me-3"></i>
+	                            <div>
+	                                <h6 class="mb-1">Thư viện tài liệu</h6>
+	                                <small class="text-muted">Tài liệu học tập</small>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="feature-card" onclick="window.location.href='#'">
+	                        <div class="d-flex align-items-center">
+	                            <i class="fas fa-users text-purple fa-2x me-3"></i>
+	                            <div>
+	                                <h6 class="mb-1">Nhóm học tập</h6>
+	                                <small class="text-muted">Tham gia nhóm học</small>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="feature-card" onclick="window.location.href='#'">
+	                        <div class="d-flex align-items-center">
+	                            <i class="fas fa-chart-line text-danger fa-2x me-3"></i>
+	                            <div>
+	                                <h6 class="mb-1">Thống kê học tập</h6>
+	                                <small class="text-muted">Theo dõi tiến độ</small>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	
+	    <!-- Search Results Modal -->
+	    <c:if test="${not empty searchResults}">
+	        <div class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);" tabindex="-1">
+	            <div class="modal-dialog">
+	                <div class="modal-content">
+	                    <div class="modal-header">
+	                        <h5 class="modal-title">Kết quả tìm kiếm: "${searchKeyword}"</h5>
+	                        <button type="button" class="btn-close" onclick="closeSearchModal()"></button>
+	                    </div>
+	                    <div class="modal-body">
+	                        <c:forEach var="result" items="${searchResults}">
+	                            <div class="d-flex align-items-center mb-3">
+	                                <img src="${result.avatarUrl != null ? result.avatarUrl : '/assets/images/default-avatar.png'}" 
+	                                     alt="Avatar" class="avatar me-3">
+	                                <div class="flex-grow-1">
+	                                    <h6 class="mb-1">${result.fullName}</h6>
+	                                    <small class="text-muted">@${result.username}</small>
+	                                </div>
+	                                <a href="<c:url value='/profile/${result.userId}'/>" 
+	                                   class="btn btn-primary btn-sm">
+	                                    Xem trang
+	                                </a>
+	                            </div>
+	                        </c:forEach>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </c:if>
+	
+	    <script src="<c:url value='/assets/js/bootstrap.bundle.min.js'/>"></script>
+	    <script>
+	        function toggleDropdown() {
+	            const dropdown = document.getElementById('userDropdown');
+	            dropdown.classList.toggle('show');
+	        }
+	
+	        // Close dropdown when clicking outside
+	        document.addEventListener('click', function(event) {
+	            const dropdown = document.getElementById('userDropdown');
+	            const userDropdown = document.querySelector('.user-dropdown');
+	            
+	            if (!userDropdown.contains(event.target)) {
+	                dropdown.classList.remove('show');
+	            }
+	        });
+	
+	        function followUser(userId) {
+	            fetch(`/profile/follow/${userId}`, {
+	                method: 'POST',
+	                headers: {
+	                    'Content-Type': 'application/json',
+	                }
+	            })
+	            .then(response => response.text())
+	            .then(data => {
+	                if (data === 'success') {
+	                    location.reload();
+	                } else {
+	                    alert('Có lỗi xảy ra');
+	                }
+	            });
+	        }
+	
+	        function likePost(postId) {
+	            fetch(`/profile/like/${postId}`, {
+	                method: 'POST',
+	                headers: {
+	                    'Content-Type': 'application/json',
+	                }
+	            })
+	            .then(response => response.text())
+	            .then(data => {
+	                if (data === 'success') {
+	                    const likeCount = document.getElementById(`like-count-${postId}`);
+	                    likeCount.textContent = parseInt(likeCount.textContent) + 1;
+	                } else {
+	                    alert('Có lỗi xảy ra');
+	                }
+	            });
+	        }
+	
+	        function sharePost(postId) {
+	            fetch(`/profile/share/${postId}`, {
+	                method: 'POST',
+	                headers: {
+	                    'Content-Type': 'application/json',
+	                }
+	            })
+	            .then(response => response.text())
+	            .then(data => {
+	                if (data === 'success') {
+	                    alert('Đã chia sẻ bài viết!');
+	                    location.reload();
+	                } else {
+	                    alert('Có lỗi xảy ra');
+	                }
+	            });
+	        }
+	
+	        function closeSearchModal() {
+	            window.location.href = '/dashboard';
+	        }
+	    </script>
+	</body>
+	</html>

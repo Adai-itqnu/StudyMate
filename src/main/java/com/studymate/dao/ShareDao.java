@@ -4,6 +4,7 @@ import java.util.List;
 import com.studymate.model.Share;
 
 public interface ShareDao {
-    int create(int userId, int postId) throws Exception;
+	int create(Share share) throws Exception;
     List<Share> findByPostId(int postId) throws Exception;
+    boolean deleteByPostId(int postId) throws Exception;
 }

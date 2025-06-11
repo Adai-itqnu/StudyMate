@@ -71,11 +71,11 @@ public class AdminController {
         }
         // Lấy danh sách users, posts, reports
         List<User> users = userService.findAll();
-        List<Post> posts = postService.findAll();
+    //    List<Post> posts = postService.findAllWithDetails();
         List<Report> reports = reportService.findAll();
         
         model.addAttribute("users", users);
-        model.addAttribute("posts", posts);
+   //     model.addAttribute("posts", posts);
         model.addAttribute("reports", reports);
         return "admin/dashboard";  // WEB-INF/views/admin/dashboard.jsp
     }

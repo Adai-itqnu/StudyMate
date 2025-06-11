@@ -68,7 +68,6 @@
                 </c:if>
 
                 <form method="post" action="register" class="auth-form">
-                    <input type="hidden" name="csrfToken" value="${csrfToken}" />
                     
                     <div class="form-row">
                         <div class="form-group">

@@ -12,7 +12,7 @@ public class CommentDaoImpl implements CommentDao {
     private static final String INSERT_SQL = "INSERT INTO comments (user_id, post_id, content) VALUES (?, ?, ?)";
     private static final String DELETE_SQL = "DELETE FROM comments WHERE comment_id=?";
     private static final String SELECT_BY_POST = "SELECT * FROM comments WHERE post_id=? ORDER BY created_at ASC";
-
+    private static final String DELETE_BY_POST = "DELETE FROM comments WHERE post_id = ?";
     @Override
     public int create(Comment comment) throws Exception {
         try (Connection conn = DBConnectionUtil.getConnection();
@@ -56,5 +56,14 @@ public class CommentDaoImpl implements CommentDao {
             }
         }
         return list;
+    }
+    
+    @Override
+    public boolean deleteByPostId(int postId) throws Exception {
+      try (Connection conn = DBConnectionUtil.getConnection();
+           PreparedStatement ps = conn.prepareStatement(DELETE_BY_POST)) {
+        ps.setInt(1, postId);
+        return ps.executeUpdate() > 0;
+      }
     }
 }

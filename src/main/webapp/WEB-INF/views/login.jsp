@@ -71,7 +71,7 @@
                 </c:if>
 
                 <form method="post" action="login" class="auth-form">
-                    <input type="hidden" name="csrfToken" value="${csrfToken}" />
+                 
                     
                     <div class="form-group">
                         <label for="email">

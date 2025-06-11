@@ -3,20 +3,11 @@ package com.studymate.service;
 import com.studymate.model.Post;
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
 public interface PostService {
-    /**
-     * Lấy danh sách tất cả bài viết
+    /** 
+     * Tạo post; nếu fileUrl ≠ null thì tạo thêm attachment record 
+     * trả về postId nếu cần, hoặc 0
      */
+    int create(Post post, String fileUrl) throws Exception;
     List<Post> findAll() throws Exception;
-
-    /**
-     * Xóa bài viết theo ID
-     */
-    boolean delete(int postId) throws Exception;
-    
-    List<Post> search(String keyword) throws Exception;
-    
-    int create(Post post, MultipartFile attachment) throws Exception;
 }

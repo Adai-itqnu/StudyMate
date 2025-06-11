@@ -32,4 +32,43 @@ public class UserServiceImpl implements UserService {
     public List<User> findAll() throws Exception {
         return userDao.findAll();
     }
+
+    @Override
+    public User findById(int userId) throws Exception {
+        return userDao.findById(userId);
+    }
+
+    @Override
+    public boolean updateUser(User user) throws Exception {
+        User existingUser = userDao.findById(user.getUserId());
+        if (existingUser == null) {
+            throw new Exception("Không tìm thấy user");
+        }
+        
+        // Kiểm tra email đã tồn tại (ngoại trừ email hiện tại)
+        User userWithEmail = userDao.findByEmail(user.getEmail());
+        if (userWithEmail != null && userWithEmail.getUserId() != user.getUserId()) {
+            throw new Exception("Email đã được sử dụng bởi user khác");
+        }
+        
+        // Giữ nguyên password cũ nếu không thay đổi
+        user.setPassword(existingUser.getPassword());
+        
+        return userDao.update(user);
+    }
+
+    @Override
+    public boolean updatePassword(int userId, String oldPassword, String newPassword) throws Exception {
+        User user = userDao.findById(userId);
+        if (user == null) {
+            throw new Exception("Không tìm thấy user");
+        }
+        
+        if (!PasswordUtil.verify(oldPassword, user.getPassword())) {
+            throw new Exception("Mật khẩu cũ không đúng");
+        }
+        
+        user.setPassword(PasswordUtil.hash(newPassword));
+        return userDao.update(user);
+    }
 }

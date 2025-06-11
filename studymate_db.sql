@@ -47,7 +47,7 @@ CREATE TABLE posts (
 );
 
 -- Bảng post_attachments (file/ảnh đính kèm của post)
-CREATE TABLE post_attachments (
+CREATE TABLE attachments (
     attachment_id  INT AUTO_INCREMENT PRIMARY KEY,
     post_id        INT NOT NULL,
     file_url       VARCHAR(500) NOT NULL,
@@ -57,8 +57,8 @@ CREATE TABLE post_attachments (
 );
 
 -- Bảng follows (theo dõi)
-CREATE TABLE follows (
-    follower_id  INT NOT NULL,
+CREATE TABLE follows (	
+    follower_id  INT NOT NULL,		
     followee_id  INT NOT NULL,
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (follower_id, followee_id),
