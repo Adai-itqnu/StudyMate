@@ -18,7 +18,7 @@ public class User {
     private Date updatedAt;
     private String status;
     private boolean systemAdmin;
-
+    
     public User() {}
 
     // getters và setters

@@ -152,6 +152,7 @@ public class UserDaoImpl implements UserDao {
         u.setCreatedAt(rs.getTimestamp("created_at"));
         u.setUpdatedAt(rs.getTimestamp("updated_at"));
         u.setStatus(rs.getString("status"));
+        u.setSystemAdmin(rs.getBoolean("is_system_admin")); // admin
         return u;
     }
 }

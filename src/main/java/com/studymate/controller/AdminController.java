@@ -25,42 +25,6 @@ public class AdminController {
     private final PostService postService = new PostServiceImpl();
     private final ReportService reportService = new ReportServiceImpl();
 
-    // GET admin login form
-    @GetMapping("/admin/login")
-    public String showAdminLogin(Model model, HttpServletRequest req) {
-        model.addAttribute("csrfToken", req.getSession().getAttribute("csrfToken"));
-        return "admin/login";  // WEB-INF/views/admin/login.jsp
-    }
-
-    // POST admin login
-    @PostMapping("/admin/login")
-    public String doAdminLogin(
-        @RequestParam String email,
-        @RequestParam String password,
-        @RequestParam String csrfToken,
-        HttpServletRequest request,
-        Model model
-    ) {
-        try {
-            User u = userService.login(email, password);
-            if (u != null && "ADMIN".equals(u.getRole())) {
-                // invalidate old session
-                request.getSession().invalidate();
-                HttpSession session = request.getSession(true);
-                session.setAttribute("adminUser", u);
-                return "redirect:/admin/dashboard";
-            } else {
-                model.addAttribute("error", "Email hoặc mật khẩu không đúng hoặc không có quyền ADMIN");
-                model.addAttribute("csrfToken", request.getSession().getAttribute("csrfToken"));
-                return "admin/login";
-            }
-        } catch (Exception ex) {
-            model.addAttribute("error", ex.getMessage());
-            model.addAttribute("csrfToken", request.getSession().getAttribute("csrfToken"));
-            return "admin/login";
-        }
-    }
-
     // Admin dashboard
     @GetMapping("/admin/dashboard")
     public String adminDashboard(HttpSession session, Model model) throws Exception {

@@ -35,6 +35,15 @@ public class AuthController {
                 request.getSession().invalidate();
                 HttpSession newSession = request.getSession(true);
                 newSession.setAttribute("currentUser", u);
+                
+                // Kiểm tra quyền admin (cả role và systemAdmin)
+                if ("ADMIN".equals(u.getRole()) || u.isSystemAdmin()) {
+                    // Set thêm adminUser cho AdminController
+                    newSession.setAttribute("adminUser", u);
+                    return "redirect:/admin/dashboard";
+                }
+                
+                // User thường
                 return "redirect:/dashboard";
             } else {
                 model.addAttribute("error", "Email hoặc mật khẩu không đúng");
