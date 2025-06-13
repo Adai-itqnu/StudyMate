@@ -155,4 +155,28 @@ public class UserDaoImpl implements UserDao {
         u.setSystemAdmin(rs.getBoolean("is_system_admin")); // admin
         return u;
     }
+    
+    @Override
+    public List<User> searchByName(String keyword) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM users WHERE (fullname LIKE ? OR username LIKE ?) AND status = 'ACTIVE' ORDER BY fullname";
+        
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            String searchKeyword = "%" + keyword + "%";
+            pstmt.setString(1, searchKeyword);
+            pstmt.setString(2, searchKeyword);
+            
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                users.add(mapResultSetToUser(rs));
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return users;
+    }
 }

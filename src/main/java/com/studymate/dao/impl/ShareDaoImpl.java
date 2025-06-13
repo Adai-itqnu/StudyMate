@@ -56,4 +56,21 @@ public class ShareDaoImpl implements ShareDao {
         return ps.executeUpdate() > 0;
       }
     }
+    @Override
+    public boolean deleteShare(int userId, int postId) {
+        String sql = "DELETE FROM shares WHERE user_id = ? AND post_id = ?";
+        
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, postId);
+            
+            return pstmt.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

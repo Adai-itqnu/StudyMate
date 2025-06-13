@@ -60,4 +60,76 @@ public class LikeDaoImpl implements LikeDao {
       }
     }
    
+    @Override
+    public boolean toggleLike(int userId, int postId) {
+        try {
+            if (isLiked(userId, postId)) {
+                // Unlike
+                String sql = "DELETE FROM likes WHERE user_id = ? AND post_id = ?";
+                try (Connection conn = DBConnectionUtil.getConnection();
+                     PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    
+                    pstmt.setInt(1, userId);
+                    pstmt.setInt(2, postId);
+                    return pstmt.executeUpdate() > 0;
+                }
+            } else {
+                // Like
+                String sql = "INSERT INTO likes (user_id, post_id) VALUES (?, ?)";
+                try (Connection conn = DBConnectionUtil.getConnection();
+                     PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    
+                    pstmt.setInt(1, userId);
+                    pstmt.setInt(2, postId);
+                    return pstmt.executeUpdate() > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isLiked(int userId, int postId) {
+        String sql = "SELECT COUNT(*) FROM likes WHERE user_id = ? AND post_id = ?";
+        
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, postId);
+            
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
+
+    @Override
+    public int getLikeCount(int postId) {
+        String sql = "SELECT COUNT(*) FROM likes WHERE post_id = ?";
+        
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, postId);
+            
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return 0;
+    }
 }
