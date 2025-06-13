@@ -21,4 +21,8 @@ public interface UserDao {
 
     // Lấy tất cả user (nếu cần)
     List<User> findAll() throws Exception;
+    
+ // Tìm kiếm UserDao interface:
+    List<User> searchByName(String keyword);
+
 }
