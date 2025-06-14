@@ -119,16 +119,6 @@ CREATE TABLE shares (
     FOREIGN KEY (post_id) REFERENCES posts(post_id)
 );
 
--- Bảng reports (báo cáo)
-CREATE TABLE reports (
-    report_id        INT AUTO_INCREMENT PRIMARY KEY,
-    reporter_id      INT,
-    reported_post_id INT,
-    reason           VARCHAR(255),
-    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (reporter_id)      REFERENCES users(user_id),
-    FOREIGN KEY (reported_post_id) REFERENCES posts(post_id)
-);
 
 -- Bảng rooms (phòng học)
 CREATE TABLE rooms (

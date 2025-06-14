@@ -76,9 +76,9 @@
                             StudyMate là nền tảng học tập thông minh giúp bạn quản lý quá trình học tập một cách khoa học và hiệu quả. 
                             Tạo môn học, đặt mục tiêu, viết ghi chú và kết nối với cộng đồng học tập.
                         </p>
-                        
+
                         <div class="hero-cta">
-                            <a href="/register" class="btn-primary-hero">
+                            <a href="${pageContext.request.contextPath}/register" class="btn-primary-hero">
                                 Bắt đầu ngay <i class="fas fa-arrow-right ms-2"></i>
                             </a>
                             <a href="#features" class="btn-secondary-hero">

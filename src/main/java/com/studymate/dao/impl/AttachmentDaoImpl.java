@@ -13,6 +13,8 @@ public class AttachmentDaoImpl implements AttachmentDao {
         "INSERT INTO attachments (post_id, file_url, file_type) VALUES (?, ?, ?)";
     private static final String SELECT_BY_POST_ID = 
         "SELECT * FROM attachments WHERE post_id = ?";
+    private static final String DELETE_BY_ID_SQL =
+    	      "DELETE FROM post_attachments WHERE attachment_id = ?";
 
     @Override
     public int create(Attachment att) throws Exception {
@@ -61,5 +63,13 @@ public class AttachmentDaoImpl implements AttachmentDao {
         }
         
         return attachments;
+    }
+    @Override
+    public boolean deleteById(int attachmentId) throws Exception {
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(DELETE_BY_ID_SQL)) {
+            ps.setInt(1, attachmentId);
+            return ps.executeUpdate() > 0;
+        }
     }
 }

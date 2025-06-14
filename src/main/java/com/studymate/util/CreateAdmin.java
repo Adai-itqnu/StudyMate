@@ -38,7 +38,7 @@ public class CreateAdmin {
             
             // Set ngày sinh
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            admin.setDateOfBirth(sdf.parse("1990-01-01"));
+            admin.setDateOfBirth(sdf.parse("2004-01-01"));
             
             // Tạo admin
             int adminId = userService.register(admin);

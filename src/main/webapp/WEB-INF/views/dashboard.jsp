@@ -44,7 +44,7 @@
 	                    <div class="d-flex justify-content-end">
 	                        <div class="user-dropdown">
 	                            <div class="d-flex align-items-center cursor-pointer" onclick="toggleDropdown()">
-	                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : '/assets/images/default-avatar.png'}" 
+	                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : 'resources/assets/images/avatar.png'}" 
 	                                     alt="Avatar" class="avatar me-2">
 	                                <span class="me-2">${currentUser.fullName}</span>
 	                                <i class="fas fa-chevron-down"></i>
@@ -80,7 +80,7 @@
 	                    <c:forEach var="suggestion" items="${suggestions}">
 	                        <div class="suggestion-card">
 	                            <div class="d-flex align-items-center">
-	                                <img src="${suggestion.avatarUrl != null ? suggestion.avatarUrl : '/assets/images/default-avatar.png'}" 
+	                                <img src="${suggestion.avatarUrl != null ? suggestion.avatarUrl : 'resources/assets/images/avatar.png'}" 
 	                                     alt="Avatar" class="avatar me-3">
 	                                <div class="flex-grow-1">
 	                                    <h6 class="mb-1">${suggestion.fullName}</h6>
@@ -165,7 +165,7 @@
 	                                            <img src="${attachment.fileUrl}" 
 	                                                 alt="Attachment" 
 	                                                 class="img-fluid rounded" 
-	                                                 style="max-width: 100%; max-height: 300px;">
+	                                                 style="max-width: 100%; max-height: 350px;">
 	                                        </c:forEach>
 	                                    </div>
 	                                </c:if>
@@ -272,109 +272,167 @@
 	        </div>
 	    </div>
 	
-	    <!-- Search Results Modal -->
-	    <c:if test="${not empty searchResults}">
-	        <div class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);" tabindex="-1">
-	            <div class="modal-dialog">
-	                <div class="modal-content">
-	                    <div class="modal-header">
-	                        <h5 class="modal-title">Kết quả tìm kiếm: "${searchKeyword}"</h5>
-	                        <button type="button" class="btn-close" onclick="closeSearchModal()"></button>
-	                    </div>
-	                    <div class="modal-body">
-	                        <c:forEach var="result" items="${searchResults}">
-	                            <div class="d-flex align-items-center mb-3">
-	                                <img src="${result.avatarUrl != null ? result.avatarUrl : '/assets/images/default-avatar.png'}" 
-	                                     alt="Avatar" class="avatar me-3">
-	                                <div class="flex-grow-1">
-	                                    <h6 class="mb-1">${result.fullName}</h6>
-	                                    <small class="text-muted">@${result.username}</small>
-	                                </div>
-	                                <a href="<c:url value='/profile/${result.userId}'/>" 
-	                                   class="btn btn-primary btn-sm">
-	                                    Xem trang
-	                                </a>
-	                            </div>
-	                        </c:forEach>
-	                    </div>
-	                </div>
-	            </div>
-	        </div>
-	    </c:if>
+<!-- Search Results Modal -->
+<c:if test="${not empty searchResults}">
+<div class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-search me-2"></i>
+                    Kết quả tìm kiếm: "${searchKeyword}"
+                </h5>
+                <button type="button" class="btn-close btn-close-white" onclick="closeSearchModal()"></button>
+            </div>
+            
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                <c:choose>
+                    <c:when test="${empty searchResults}">
+                        <!-- Không tìm thấy kết quả -->
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-search-minus text-muted" style="font-size: 4rem;"></i>
+                            </div>
+                            <h5 class="text-muted mb-3">Không tìm thấy kết quả</h5>
+                            <p class="text-muted mb-4">
+                                Không có kết quả nào cho từ khóa "<strong>${searchKeyword}</strong>"
+                            </p>
+                            <div class="alert alert-info" role="alert">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Gợi ý:</strong> Hãy thử tìm kiếm với từ khóa khác hoặc kiểm tra lại chính tả
+                            </div>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <!-- Có kết quả -->
+                        <c:forEach var="result" items="${searchResults}">
+                            <div class="d-flex align-items-center mb-3 p-3 border rounded-3 hover-card">
+                                <img src="${result.avatarUrl != null ? result.avatarUrl : 'resources/assets/images/avatar.png'}"
+                                     alt="Avatar" class="avatar me-3">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-bold">${result.fullName}</h6>
+                                    <small class="text-muted">@${result.username}</small>
+                                </div>
+                                <a href="<c:url value='/profile/${result.userId}'/>"
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-user me-1"></i>Xem trang
+                                </a>
+                            </div>
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+            
+            <!-- Modal Footer với các nút thoát -->
+            <div class="modal-footer d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        <c:choose>
+                            <c:when test="${empty searchResults}">
+                                Không tìm thấy kết quả nào
+                            </c:when>
+                            <c:otherwise>
+                                Tìm thấy ${searchResults.size()} kết quả
+                            </c:otherwise>
+                        </c:choose>
+                    </small>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-secondary me-2" onclick="closeSearchModal()">
+                        <i class="fas fa-times me-1"></i>Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</c:if>
 	
 	    <script src="<c:url value='/assets/js/bootstrap.bundle.min.js'/>"></script>
 	    <script>
-	        function toggleDropdown() {
-	            const dropdown = document.getElementById('userDropdown');
-	            dropdown.classList.toggle('show');
+	    function toggleDropdown() {
+	        const dropdown = document.getElementById('userDropdown');
+	        dropdown.classList.toggle('show');
+	    }
+
+	    // Close dropdown when clicking outside
+	    document.addEventListener('click', function(event) {
+	        const dropdown = document.getElementById('userDropdown');
+	        const userDropdown = document.querySelector('.user-dropdown');
+
+	        if (userDropdown && !userDropdown.contains(event.target)) {
+	            dropdown.classList.remove('show');
 	        }
-	
-	        // Close dropdown when clicking outside
-	        document.addEventListener('click', function(event) {
-	            const dropdown = document.getElementById('userDropdown');
-	            const userDropdown = document.querySelector('.user-dropdown');
-	            
-	            if (!userDropdown.contains(event.target)) {
-	                dropdown.classList.remove('show');
+	    });
+
+	    function followUser(userId) {
+	        fetch(`/profile/follow/${userId}`, {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	            }
+	        })
+	        .then(response => response.text())
+	        .then(data => {
+	            if (data === 'success') {
+	                location.reload();
+	            } else {
+	                alert('Có lỗi xảy ra');
 	            }
 	        });
-	
-	        function followUser(userId) {
-	            fetch(`/profile/follow/${userId}`, {
-	                method: 'POST',
-	                headers: {
-	                    'Content-Type': 'application/json',
-	                }
-	            })
-	            .then(response => response.text())
-	            .then(data => {
-	                if (data === 'success') {
-	                    location.reload();
-	                } else {
-	                    alert('Có lỗi xảy ra');
-	                }
-	            });
-	        }
-	
-	        function likePost(postId) {
-	            fetch(`/profile/like/${postId}`, {
-	                method: 'POST',
-	                headers: {
-	                    'Content-Type': 'application/json',
-	                }
-	            })
-	            .then(response => response.text())
-	            .then(data => {
-	                if (data === 'success') {
-	                    const likeCount = document.getElementById(`like-count-${postId}`);
+	    }
+
+	    function likePost(postId) {
+	        fetch(`/profile/like/${postId}`, {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	            }
+	        })
+	        .then(response => response.text())
+	        .then(data => {
+	            if (data === 'success') {
+	                const likeCount = document.getElementById(`like-count-${postId}`);
+	                if (likeCount) {
 	                    likeCount.textContent = parseInt(likeCount.textContent) + 1;
-	                } else {
-	                    alert('Có lỗi xảy ra');
 	                }
-	            });
+	            } else {
+	                alert('Có lỗi xảy ra');
+	            }
+	        });
+	    }
+
+	    function sharePost(postId) {
+	        fetch(`/profile/share/${postId}`, {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	            }
+	        })
+	        .then(response => response.text())
+	        .then(data => {
+	            if (data === 'success') {
+	                alert('Đã chia sẻ bài viết!');
+	                location.reload();
+	            } else {
+	                alert('Có lỗi xảy ra');
+	            }
+	        });
+	    }
+
+	    // Hàm đóng modal (giữ nguyên trang hiện tại)
+	    function closeSearchModal() {
+	    	window.location.href = '${pageContext.request.contextPath}/dashboard';
+	    }
+
+
+	    // Đóng modal khi nhấn ESC
+	    document.addEventListener('keydown', function(event) {
+	        if (event.key === 'Escape') {
+	            closeSearchModal();
 	        }
-	
-	        function sharePost(postId) {
-	            fetch(`/profile/share/${postId}`, {
-	                method: 'POST',
-	                headers: {
-	                    'Content-Type': 'application/json',
-	                }
-	            })
-	            .then(response => response.text())
-	            .then(data => {
-	                if (data === 'success') {
-	                    alert('Đã chia sẻ bài viết!');
-	                    location.reload();
-	                } else {
-	                    alert('Có lỗi xảy ra');
-	                }
-	            });
-	        }
-	
-	        function closeSearchModal() {
-	            window.location.href = '/dashboard';
-	        }
+	    });
 	    </script>
 	</body>
 	</html>

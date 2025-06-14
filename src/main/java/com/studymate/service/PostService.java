@@ -10,4 +10,12 @@ public interface PostService {
      */
     int create(Post post, String fileUrl) throws Exception;
     List<Post> findAll() throws Exception;
+    
+    /** 
+     * Lấy tất cả posts kèm chi tiết: attachments, likes, comments, shares 
+     */
+    List<Post> findAllWithDetails() throws Exception;			
+    
+    /** Xóa post và tất cả dữ liệu con (attachments, likes, comments, shares) */
+    void delete(int postId) throws Exception;
 }

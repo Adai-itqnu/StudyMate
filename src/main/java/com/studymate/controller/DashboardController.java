@@ -52,7 +52,7 @@ public class DashboardController {
         model.addAttribute("suggestions", suggestions);
         
         // 5. Thêm token vào model
-        model.addAttribute("csrfToken", session.getAttribute("csrfToken"));
+      //  model.addAttribute("csrfToken", session.getAttribute("csrfToken"));
         
         // 6. Thêm current user vào model
         model.addAttribute("currentUser", current);

@@ -76,9 +76,9 @@
                     <div class="form-group">
                         <label for="email">
                             <i class="fas fa-envelope"></i>
-                            Email
+                            Username
                         </label>
-                        <input type="email" id="email" name="email" placeholder="Nhập email của bạn" required>
+                        <input type="username" id="username" name="username" placeholder="Nhập username của bạn" required>
                     </div>
                     
                     <div class="form-group">

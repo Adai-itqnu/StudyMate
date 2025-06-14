@@ -20,7 +20,7 @@ public class UserDaoImpl implements UserDao {
             ps.setString(2, user.getUsername());
             ps.setString(3, user.getPassword());
             ps.setString(4, user.getRole());
-            ps.setString(5, user.getAvatarUrl());
+            ps.setString(5, user.getAvatarUrl());	
             ps.setString(6, user.getBio());
             ps.setString(7, user.getPhone());
             ps.setString(8, user.getEmail());
@@ -111,6 +111,21 @@ public class UserDaoImpl implements UserDao {
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToUser(rs);
+                }
+                return null;
+            }
+        }
+    }
+    
+    @Override
+    public User findByUsername(String username) throws Exception {
+        String sql = "SELECT * FROM users WHERE username = ?";
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapRowToUser(rs);

@@ -1,18 +1,21 @@
 package com.studymate.service.impl;
 
-import com.studymate.dao.AttachmentDao;
-import com.studymate.dao.PostDao;
-import com.studymate.dao.impl.AttachmentDaoImpl;
-import com.studymate.dao.impl.PostDaoImpl;
+import com.studymate.dao.*;
+import com.studymate.dao.impl.*;
 import com.studymate.model.Attachment;
+import com.studymate.model.Comment;
 import com.studymate.model.Post;
 import com.studymate.service.PostService;
 
 import java.util.List;
 
 public class PostServiceImpl implements PostService {
-    private final PostDao postDao = new PostDaoImpl();
+
+    private final PostDao postDao             = new PostDaoImpl();
     private final AttachmentDao attachmentDao = new AttachmentDaoImpl();
+    private final LikeDao likeDao             = new LikeDaoImpl();
+    private final CommentDao commentDao       = new CommentDaoImpl();
+    private final ShareDao shareDao           = new ShareDaoImpl();
 
     @Override
     public int create(Post post, String fileUrl) throws Exception {
@@ -35,4 +38,34 @@ public class PostServiceImpl implements PostService {
         }
         return posts;
     }
+
+    @Override
+    public List<Post> findAllWithDetails() throws Exception {
+        List<Post> posts = postDao.findAll();
+        for (Post p : posts) {
+            int pid = p.getPostId();
+            p.setAttachments(attachmentDao.findByPostId(pid));
+            p.setLikeCount(likeDao.countByPostId(pid));
+            List<Comment> cmts = commentDao.findByPostId(pid);
+            p.setComments(cmts);
+            p.setCommentCount(cmts.size());
+            p.setShares(shareDao.findByPostId(pid));
+        }
+        return posts;
+    }
+
+    @Override
+    public void delete(int postId) throws Exception {
+        // 1) Xóa attachments
+        for (Attachment a : attachmentDao.findByPostId(postId)) {
+            attachmentDao.deleteById(a.getAttachmentId());
+        }
+        // 2) Xóa likes, comments, shares
+        likeDao.deleteByPostId(postId);
+        commentDao.deleteByPostId(postId);
+        shareDao.deleteByPostId(postId);
+        // 3) Xóa post
+        postDao.delete(postId);
+    }
 }
+	

@@ -4,7 +4,6 @@ import com.studymate.model.User;
 import java.util.List;
 
 public interface UserService {
-
     /**
      * Đăng ký user mới, trả về userId vừa tạo
      */
@@ -34,4 +33,7 @@ public interface UserService {
      * Cập nhật mật khẩu user
      */
     boolean updatePassword(int userId, String oldPassword, String newPassword) throws Exception;
+    
+    // Xóa user		
+    boolean deleteUser(int userId) throws Exception; 
 }

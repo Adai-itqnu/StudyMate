@@ -24,13 +24,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public String doLogin(
-        @RequestParam String email,
+        @RequestParam String username,
         @RequestParam String password,
         HttpServletRequest request,
         Model model
     ) {
         try {
-            User u = userService.login(email, password);
+            User u = userService.login(username, password);	
             if (u != null) {
                 request.getSession().invalidate();
                 HttpSession newSession = request.getSession(true);

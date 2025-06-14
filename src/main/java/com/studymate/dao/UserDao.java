@@ -18,7 +18,10 @@ public interface UserDao {
 
     // Lấy user theo email (dùng cho đăng nhập)
     User findByEmail(String email) throws Exception;
+    
+    User findByUsername(String username) throws Exception;
 
     // Lấy tất cả user (nếu cần)
     List<User> findAll() throws Exception;
+    
 }

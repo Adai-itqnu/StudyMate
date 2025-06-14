@@ -14,14 +14,16 @@ public class UserServiceImpl implements UserService {
     public int register(User user) throws Exception {
         if (userDao.findByEmail(user.getEmail()) != null) {
             throw new Exception("Email đã được đăng ký");
+        }else if(userDao.findByUsername(user.getUsername()) != null) {
+        	throw new Exception("Userame đã được đăng ký");
         }
         user.setPassword(PasswordUtil.hash(user.getPassword()));
         return userDao.create(user);
     }
 
     @Override
-    public User login(String email, String password) throws Exception {
-        User user = userDao.findByEmail(email);
+    public User login(String username, String password) throws Exception {
+        User user = userDao.findByUsername(username);
         if (user != null && PasswordUtil.verify(password, user.getPassword())) {
             return user;
         }
@@ -70,5 +72,10 @@ public class UserServiceImpl implements UserService {
         
         user.setPassword(PasswordUtil.hash(newPassword));
         return userDao.update(user);
+    }
+    
+    @Override
+    public boolean deleteUser(int userId) throws Exception {
+        return userDao.delete(userId);
     }
 }
