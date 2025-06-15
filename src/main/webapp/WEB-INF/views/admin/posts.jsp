@@ -10,14 +10,11 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/assets/css/admin_posts.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/assets/css/admin_dashboard.css"/>
     <title>Quản lý bài viết - StudyMate Admin</title>
-    <style>
-      
-    </style>
 </head>
 <body>
     <!-- Header -->
     <div class="header">
-        <a href="/admin/dashboard" class="logo">StudyMate Admin</a>
+        <a href="${pageContext.request.contextPath}/admin/dashboard" class="logo">StudyMate Admin</a>
         <div class="admin-info">
             <span class="admin-name">👤 <c:out value="${sessionScope.currentUser.fullName}" default="Administrator"/></span>
             <a href="${pageContext.request.contextPath}/login" class="logout-btn">Đăng xuất</a>
@@ -34,7 +31,7 @@
 
         <!-- Search Section -->
         <div class="search-section">
-            <form action="/admin/posts/search" method="get" class="search-form">
+            <form action="${pageContext.request.contextPath}/admin/posts/search" method="get" class="search-form">
                 <input 
                     type="text" 
                     name="keyword" 
@@ -43,7 +40,6 @@
                     value="${keyword}"
                 >
                 <button type="submit" class="search-btn">🔍 Tìm kiếm</button>
-                <a href="/admin/posts" class="clear-btn">🔄 Xóa bộ lọc</a>
             </form>
         </div>
 
@@ -73,7 +69,7 @@
                                     <div class="post-meta">
                                         <div class="post-author">
                                             <img 
-                                                src="/assets/images/default-avatar.png" 
+                                                src="${pageContext.request.contextPath}/assets/images/default-avatar.png" 
                                                 alt="Avatar" 
                                                 class="author-avatar"
                                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSIjOTk5Ii8+CjxwYXRoIGQ9Ik0xMiAxNEM4LjEzNDAxIDE0IDUgMTcuMTM0IDUgMjFIMTlDMTkgMTcuMTM0IDE1Ljg2NiAxNCAxMiAxNFoiIGZpbGw9IiM5OTkiLz4KPC9zdmc+'"
@@ -92,9 +88,6 @@
                                     </div>
                                 </div>
                                 <div class="post-actions">
-                                    <a href="/admin/posts/edit/${post.postId}" class="btn-edit">
-                                        ✏️ Sửa
-                                    </a>
                                     <button 
                                         type="button" 
                                         class="btn-delete" 
@@ -165,7 +158,7 @@
     </div>
 
     <!-- Form ẩn để xóa post -->
-    <form id="deletePostForm" method="POST" action="/admin/posts/delete" style="display: none;">
+    <form id="deletePostForm" method="POST" action="${pageContext.request.contextPath}/admin/posts/delete" style="display: none;">
         <input type="hidden" name="postId" id="deletePostId">
     </form>
 

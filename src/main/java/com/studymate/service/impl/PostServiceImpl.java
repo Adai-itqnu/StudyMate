@@ -56,16 +56,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void delete(int postId) throws Exception {
-        // 1) Xóa attachments
-        for (Attachment a : attachmentDao.findByPostId(postId)) {
-            attachmentDao.deleteById(a.getAttachmentId());
+        // Sử dụng transaction để đảm bảo tính toàn vẹn dữ liệu
+        // Chỉ cần gọi postDao.delete() vì nó đã xử lý transaction
+        boolean success = postDao.delete(postId);
+        if (!success) {
+            throw new Exception("Failed to delete post with ID: " + postId);
         }
-        // 2) Xóa likes, comments, shares
-        likeDao.deleteByPostId(postId);
-        commentDao.deleteByPostId(postId);
-        shareDao.deleteByPostId(postId);
-        // 3) Xóa post
-        postDao.delete(postId);
     }
 }
 	

@@ -21,7 +21,8 @@ public class PostDaoImpl implements PostDao {
       "INSERT INTO posts (user_id, title, body, privacy, status) VALUES (?,?,?,?, 'PUBLISHED')";
     private static final String SELECT_ALL =
       "SELECT * FROM posts ORDER BY created_at DESC";
-    private static final String DELETE_SQL       = "DELETE FROM posts WHERE post_id = ?";
+    private static final String DELETE_ATTACHMENTS_SQL = "DELETE FROM attachments WHERE post_id = ?";
+    private static final String DELETE_POST_SQL = "DELETE FROM posts WHERE post_id = ?";
 
     @Override
     public int create(Post post) throws Exception {
@@ -33,7 +34,7 @@ public class PostDaoImpl implements PostDao {
             ps.setString(3, post.getBody());
             ps.setString(4, post.getPrivacy());
             ps.executeUpdate();
-            try (ResultSet rs = ps.getGeneratedKeys()) {
+            try (ResultSet rs = ps.getGeneratedKeys()) {		
                 return rs.next() ? rs.getInt(1) : -1;
             }
         }
@@ -77,15 +78,75 @@ public class PostDaoImpl implements PostDao {
             p.setCommentCount(cmts.size());
             // shares
             p.setShares(shareDao.findByPostId(pid));
-        }
+        }	
         return posts;
     }
+    
     @Override
     public boolean delete(int postId) throws Exception {
-        try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
-            ps.setInt(1, postId);
-            return ps.executeUpdate() > 0;
+        Connection conn = null;
+        try {
+            conn = DBConnectionUtil.getConnection();
+            conn.setAutoCommit(false); // Bắt đầu transaction
+            
+            // Bước 1: Xóa shares (nếu có foreign key constraint)
+            try (PreparedStatement psShares = conn.prepareStatement("DELETE FROM shares WHERE post_id = ?")) {
+                psShares.setInt(1, postId);
+                psShares.executeUpdate();
+            }
+            
+            // Bước 2: Xóa comments (nếu có foreign key constraint) 
+            try (PreparedStatement psComments = conn.prepareStatement("DELETE FROM comments WHERE post_id = ?")) {
+                psComments.setInt(1, postId);
+                psComments.executeUpdate();
+            }
+            
+            // Bước 3: Xóa likes (nếu có foreign key constraint)
+            try (PreparedStatement psLikes = conn.prepareStatement("DELETE FROM likes WHERE post_id = ?")) {
+                psLikes.setInt(1, postId);
+                psLikes.executeUpdate();
+            }
+            
+            // Bước 4: Xóa attachments
+            try (PreparedStatement psAttachments = conn.prepareStatement(DELETE_ATTACHMENTS_SQL)) {
+                psAttachments.setInt(1, postId);
+                psAttachments.executeUpdate();
+            }
+            
+            // Bước 5: Xóa post
+            try (PreparedStatement psPost = conn.prepareStatement(DELETE_POST_SQL)) {
+                psPost.setInt(1, postId);
+                int result = psPost.executeUpdate();
+                
+                if (result > 0) {
+                    conn.commit(); // Commit transaction nếu thành công
+                    return true;
+                } else {
+                    conn.rollback(); // Rollback nếu không xóa được post
+                    return false;
+                }
+            }
+            
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Rollback nếu có lỗi
+                } catch (SQLException rollbackEx) {
+                    // Log rollback exception
+                    e.addSuppressed(rollbackEx);
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true); // Restore auto-commit
+                    conn.close();
+                } catch (SQLException closeEx) {
+                    // Log close exception but don't throw
+                    System.err.println("Error closing connection: " + closeEx.getMessage());
+                }
+            }
         }
     }
 }

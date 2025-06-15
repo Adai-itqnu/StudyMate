@@ -152,3 +152,27 @@ CREATE TABLE schedules (
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id),
     FOREIGN KEY (room_id)    REFERENCES rooms(room_id)
 );
+
+
+INSERT INTO schools (name) VALUES 
+('THPT Nguyễn Huệ'),
+('THPT Lê Quý Đôn'),
+('THPT Trần Phú'),
+('THPT Nguyễn Trãi'),
+('THPT Lý Thường Kiệt'),
+('THPT Hai Bà Trưng'),
+('THPT Nguyễn Du'),
+('THPT Phan Châu Trinh'),
+('THPT Võ Nguyên Giáp'),
+('THPT Lê Lợi'),
+('THPT Trường Chinh'),
+('THPT Nguyễn Tất Thành'),
+('THPT Chu Văn An'),
+('THPT Quang Trung'),
+('THPT Hùng Vương'),
+('THPT Ngô Quyền'),
+('THPT Lê Thánh Tông'),
+('THPT Trần Hưng Đạo'),
+('THPT Nguyễn Bỉnh Khiêm'),
+('THPT Phan Bội Châu');
+

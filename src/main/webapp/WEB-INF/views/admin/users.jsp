@@ -14,7 +14,7 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <a href="/admin/dashboard" class="logo">StudyMate Admin</a>
+        <a href="${pageContext.request.contextPath}/admin/dashboard" class="logo">StudyMate Admin</a>
         <div class="admin-info">
             <span class="admin-name">👤 <c:out value="${sessionScope.currentUser.fullName}" default="Administrator"/></span>
             <a href="${pageContext.request.contextPath}/login" class="logout-btn">Đăng xuất</a>
@@ -31,7 +31,7 @@
 
         <!-- Search Section -->
         <div class="search-section">
-            <form action="/admin/users/search" method="get" class="search-form">
+            <form action="${pageContext.request.contextPath}/admin/users/search" method="get" class="search-form">
                 <input 
                     type="text" 
                     name="keyword" 
@@ -40,7 +40,6 @@
                     value="${keyword}"
                 >
                 <button type="submit" class="search-btn">🔍 Tìm kiếm</button>
-                <a href="/admin/users" class="clear-btn">🔄 Xóa bộ lọc</a>
             </form>
         </div>
 
@@ -78,7 +77,7 @@
                                     <td>
                                         <div class="user-info">
                                             <img 
-                                                src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : 'resources/assets/images/avatar.png'}" 
+                                                src="${user.avatarUrl != null ? user.avatarUrl : pageContext.request.contextPath += '/resources/assets/images/avatar.png'}" 
                                                 alt="Avatar" 
                                                 class="user-avatar"
                                             >
@@ -104,9 +103,6 @@
                                     </td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="/admin/users/edit/${user.userId}" class="btn-edit">
-                                                ✏️ Sửa
-                                            </a>
                                             <button 
                                                 type="button" 
                                                 class="btn-delete" 
@@ -141,7 +137,7 @@
     </div>
 
     <!-- Delete Form (Hidden) -->
-    <form id="deleteForm" action="/admin/users/delete" method="post" style="display: none;">
+    <form id="deleteForm" action="${pageContext.request.contextPath}/admin/users/delete" method="post" style="display: none;">
         <input type="hidden" name="userId" id="deleteUserId">
     </form>
 

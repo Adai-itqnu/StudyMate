@@ -143,7 +143,7 @@
 	                        <c:forEach var="post" items="${posts}">
 	                            <div class="post-card">
 	                                <div class="d-flex align-items-center mb-3">
-	                                    <img src="/assets/images/default-avatar.png" alt="Avatar" class="avatar me-3">
+	                                    <img src="resources/assets/images/avatar.png" alt="Avatar" class="avatar me-3">
 	                                    <div>
 	                                        <h6 class="mb-0">User ${post.userId}</h6>
 	                                        <small class="text-muted">

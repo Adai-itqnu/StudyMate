@@ -6,7 +6,12 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thông tin cá nhân - StudyMate</title>
+    <title>
+        <c:choose>
+            <c:when test="${isOwnProfile}">Thông tin cá nhân - StudyMate</c:when>
+            <c:otherwise>Trang cá nhân của ${profileUser.fullName} - StudyMate</c:otherwise>
+        </c:choose>
+    </title>
     <link href="<c:url value='/assets/css/bootstrap.min.css'/>" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
     <style>
@@ -47,6 +52,44 @@
             color: #adb5bd;
             font-style: italic;
         }
+        .follow-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .post-card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+        .post-actions button {
+            border: none;
+            background: none;
+            color: #6c757d;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .post-actions button:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+        .post-actions button.liked {
+            color: #dc3545;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -80,8 +123,8 @@
                 <div class="col-md-3 text-center">
                     <div class="profile-avatar">
                         <c:choose>
-                            <c:when test="${not empty currentUser.avatarUrl}">
-                                <img src="${currentUser.avatarUrl}" class="rounded-circle" width="150" height="150" alt="Avatar"/>
+                            <c:when test="${not empty profileUser.avatarUrl}">
+                                <img src="${profileUser.avatarUrl}" class="rounded-circle" width="150" height="150" alt="Avatar"/>
                             </c:when>
                             <c:otherwise>
                                 <div class="avatar-placeholder bg-white text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; margin: 0 auto;">
@@ -92,22 +135,54 @@
                     </div>
                 </div>
                 <div class="col-md-9">
-                    <h2 class="mb-2">${currentUser.fullName}</h2>
+                    <h2 class="mb-2">${profileUser.fullName}</h2>
                     <p class="mb-2">
-                        <i class="fas fa-at"></i> ${currentUser.username}
+                        <i class="fas fa-at"></i> ${profileUser.username}
                     </p>
-                    <c:if test="${not empty currentUser.bio}">
+                    <c:if test="${not empty profileUser.bio}">
                         <p class="mb-3">
-                            <i class="fas fa-quote-left"></i> ${currentUser.bio}
+                            <i class="fas fa-quote-left"></i> ${profileUser.bio}
                         </p>
                     </c:if>
-                    <div class="d-flex gap-3">
-                        <a href="<c:url value='/profile/settings'/>" class="btn btn-light">
-                            <i class="fas fa-edit"></i> Chỉnh sửa thông tin
-                        </a>
-                        <a href="<c:url value='/profile'/>" class="btn btn-outline-light">
-                            <i class="fas fa-eye"></i> Xem trang cá nhân
-                        </a>
+                    
+                    <!-- Follow Statistics -->
+                    <div class="follow-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">${followers.size()}</span>
+                            <span class="stat-label">Người theo dõi</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">${followees.size()}</span>
+                            <span class="stat-label">Đang theo dõi</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">${userPosts.size()}</span>
+                            <span class="stat-label">Bài viết</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 mt-3">
+                        <c:choose>
+                            <c:when test="${isOwnProfile}">
+                                <a href="<c:url value='/profile/settings'/>" class="btn btn-light">
+                                    <i class="fas fa-edit"></i> Chỉnh sửa thông tin
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <c:choose>
+                                    <c:when test="${isFollowing}">
+                                        <button class="btn btn-outline-light" onclick="unfollowUser(${profileUser.userId})">
+                                            <i class="fas fa-user-minus"></i> Bỏ theo dõi
+                                        </button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button class="btn btn-light" onclick="followUser(${profileUser.userId})">
+                                            <i class="fas fa-user-plus"></i> Theo dõi
+                                        </button>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
             </div>
@@ -127,51 +202,56 @@
                     <div class="card-body">
                         <div class="info-item">
                             <div class="info-label">Họ và tên</div>
-                            <div class="info-value">${currentUser.fullName}</div>
+                            <div class="info-value">${profileUser.fullName}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">Tên đăng nhập</div>
-                            <div class="info-value">@${currentUser.username}</div>
+                            <div class="info-value">@${profileUser.username}</div>
                         </div>
-                        <div class="info-item">
-                            <div class="info-label">Email</div>
-                            <div class="info-value">
-                                <i class="fas fa-envelope text-muted"></i> ${currentUser.email}
+                        
+                        <!-- Chỉ hiển thị thông tin nhạy cảm nếu là profile của chính mình -->
+                        <c:if test="${isOwnProfile}">
+                            <div class="info-item">
+                                <div class="info-label">Email</div>
+                                <div class="info-value">
+                                    <i class="fas fa-envelope text-muted"></i> ${profileUser.email}
+                                </div>
                             </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Số điện thoại</div>
-                            <div class="info-value">
-                                <c:choose>
-                                    <c:when test="${not empty currentUser.phone}">
-                                        <i class="fas fa-phone text-muted"></i> ${currentUser.phone}
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="empty-value">Chưa cập nhật</span>
-                                    </c:otherwise>
-                                </c:choose>
+                            <div class="info-item">
+                                <div class="info-label">Số điện thoại</div>
+                                <div class="info-value">
+                                    <c:choose>
+                                        <c:when test="${not empty profileUser.phone}">
+                                            <i class="fas fa-phone text-muted"></i> ${profileUser.phone}
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="empty-value">Chưa cập nhật</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
                             </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Ngày sinh</div>
-                            <div class="info-value">
-                                <c:choose>
-                                    <c:when test="${not empty currentUser.dateOfBirth}">
-                                        <i class="fas fa-calendar text-muted"></i> 
-                                        <fmt:formatDate value="${currentUser.dateOfBirth}" pattern="dd/MM/yyyy"/>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="empty-value">Chưa cập nhật</span>
-                                    </c:otherwise>
-                                </c:choose>
+                            <div class="info-item">
+                                <div class="info-label">Ngày sinh</div>
+                                <div class="info-value">
+                                    <c:choose>
+                                        <c:when test="${not empty profileUser.dateOfBirth}">
+                                            <i class="fas fa-calendar text-muted"></i> 
+                                            <fmt:formatDate value="${profileUser.dateOfBirth}" pattern="dd/MM/yyyy"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="empty-value">Chưa cập nhật</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
                             </div>
-                        </div>
+                        </c:if>
+                        
                         <div class="info-item">
                             <div class="info-label">Giới thiệu bản thân</div>
                             <div class="info-value">
                                 <c:choose>
-                                    <c:when test="${not empty currentUser.bio}">
-                                        ${currentUser.bio}
+                                    <c:when test="${not empty profileUser.bio}">
+                                        ${profileUser.bio}
                                     </c:when>
                                     <c:otherwise>
                                         <span class="empty-value">Chưa có giới thiệu</span>
@@ -196,12 +276,12 @@
                             <div class="info-label">Vai trò</div>
                             <div class="info-value">
                                 <c:choose>
-                                    <c:when test="${currentUser.role == 'ADMIN'}">
+                                    <c:when test="${profileUser.role == 'ADMIN'}">
                                         <span class="badge bg-danger">
                                             <i class="fas fa-crown"></i> Quản trị viên
                                         </span>
                                     </c:when>
-                                    <c:when test="${currentUser.role == 'TEACHER'}">
+                                    <c:when test="${profileUser.role == 'TEACHER'}">
                                         <span class="badge bg-info">
                                             <i class="fas fa-chalkboard-teacher"></i> Giáo viên
                                         </span>
@@ -218,12 +298,12 @@
                             <div class="info-label">Trạng thái tài khoản</div>
                             <div class="info-value">
                                 <c:choose>
-                                    <c:when test="${currentUser.status == 'ACTIVE'}">
+                                    <c:when test="${profileUser.status == 'ACTIVE'}">
                                         <span class="badge bg-success">
                                             <i class="fas fa-check-circle"></i> Hoạt động
                                         </span>
                                     </c:when>
-                                    <c:when test="${currentUser.status == 'INACTIVE'}">
+                                    <c:when test="${profileUser.status == 'INACTIVE'}">
                                         <span class="badge bg-warning">
                                             <i class="fas fa-pause-circle"></i> Tạm dừng
                                         </span>
@@ -240,29 +320,34 @@
                             <div class="info-label">Ngày tham gia</div>
                             <div class="info-value">
                                 <i class="fas fa-calendar-plus text-muted"></i>
-                                <fmt:formatDate value="${currentUser.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                <fmt:formatDate value="${profileUser.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
                             </div>
                         </div>
-                        <div class="info-item">
-                            <div class="info-label">Cập nhật lần cuối</div>
-                            <div class="info-value">
-                                <c:choose>
-                                    <c:when test="${not empty currentUser.updatedAt}">
-                                        <i class="fas fa-edit text-muted"></i>
-                                        <fmt:formatDate value="${currentUser.updatedAt}" pattern="dd/MM/yyyy HH:mm"/>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="empty-value">Chưa có cập nhật</span>
-                                    </c:otherwise>
-                                </c:choose>
+                        
+                        <!-- Chỉ hiển thị thông tin cập nhật nếu là profile của chính mình -->
+                        <c:if test="${isOwnProfile}">
+                            <div class="info-item">
+                                <div class="info-label">Cập nhật lần cuối</div>
+                                <div class="info-value">
+                                    <c:choose>
+                                        <c:when test="${not empty profileUser.updatedAt}">
+                                            <i class="fas fa-edit text-muted"></i>
+                                            <fmt:formatDate value="${profileUser.updatedAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="empty-value">Chưa có cập nhật</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
                             </div>
-                        </div>
+                        </c:if>
+                        
                         <div class="info-item">
                             <div class="info-label">Trường học</div>
                             <div class="info-value">
                                 <c:choose>
-                                    <c:when test="${currentUser.schoolId > 0}">
-                                        <i class="fas fa-school text-muted"></i> ID: ${currentUser.schoolId}
+                                    <c:when test="${profileUser.schoolId > 0}">
+                                        <i class="fas fa-school text-muted"></i> ID: ${profileUser.schoolId}
                                     </c:when>
                                     <c:otherwise>
                                         <span class="empty-value">Chưa chọn trường</span>
@@ -275,48 +360,244 @@
             </div>
         </div>
 
-        <!-- Quick Actions -->
+        <!-- User Posts -->
         <div class="row">
             <div class="col-12">
                 <div class="card info-card">
-                    <div class="card-header bg-warning text-dark">
+                    <div class="card-header bg-info text-white">
                         <h5 class="mb-0">
-                            <i class="fas fa-bolt"></i> Thao tác nhanh
+                            <i class="fas fa-newspaper"></i> 
+                            <c:choose>
+                                <c:when test="${isOwnProfile}">Bài viết của tôi</c:when>
+                                <c:otherwise>Bài viết của ${profileUser.fullName}</c:otherwise>
+                            </c:choose>
+                            (${userPosts.size()})
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <a href="<c:url value='/profile/settings'/>" class="btn btn-outline-primary w-100">
-                                    <i class="fas fa-user-edit"></i><br>
-                                    <small>Chỉnh sửa thông tin</small>
-                                </a>
-                            </div>
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <a href="<c:url value='/profile'/>" class="btn btn-outline-info w-100">
-                                    <i class="fas fa-eye"></i><br>
-                                    <small>Xem trang cá nhân</small>
-                                </a>
-                            </div>
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <a href="<c:url value='/post/create'/>" class="btn btn-outline-success w-100">
-                                    <i class="fas fa-plus-circle"></i><br>
-                                    <small>Tạo bài viết mới</small>
-                                </a>
-                            </div>
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <a href="<c:url value='/profile/search'/>" class="btn btn-outline-secondary w-100">
-                                    <i class="fas fa-search"></i><br>
-                                    <small>Tìm bạn bè</small>
-                                </a>
+                        <c:choose>
+                            <c:when test="${empty userPosts}">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">
+                                        <c:choose>
+                                            <c:when test="${isOwnProfile}">Bạn chưa có bài viết nào</c:when>
+                                            <c:otherwise>Người dùng này chưa có bài viết nào</c:otherwise>
+                                        </c:choose>
+                                    </p>
+                                    <c:if test="${isOwnProfile}">
+                                        <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Tạo bài viết đầu tiên
+                                        </a>
+                                    </c:if>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <c:forEach var="post" items="${userPosts}">
+                                    <div class="post-card card mb-3">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center">
+                                                <c:choose>
+                                                    <c:when test="${not empty profileUser.avatarUrl}">
+                                                        <img src="${profileUser.avatarUrl}" class="rounded-circle me-2" width="40" height="40" alt="Avatar"/>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                            <i class="fas fa-user"></i>
+                                                        </div>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                                <div>
+                                                    <strong>${profileUser.fullName}</strong>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <fmt:formatDate value="${post.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <c:if test="${isOwnProfile}">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                        <i class="fas fa-ellipsis-h"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit"></i> Chỉnh sửa</a></li>
+                                                        <li><a class="dropdown-item text-danger" href="#" onclick="deletePost(${post.postId})"><i class="fas fa-trash"></i> Xóa</a></li>
+                                                    </ul>
+                                                </div>
+                                            </c:if>
+                                        </div>
+                                        <div class="card-body">
+                                            <h6 class="card-title">${post.title}</h6>
+                                            <p class="card-text">${post.body}</p>
+                                            
+                                            <!-- Attachments -->
+                                            <c:if test="${not empty post.attachments}">
+                                                <div class="mb-3">
+                                                    <c:forEach var="attachment" items="${post.attachments}">
+                                                        <c:if test="${attachment.fileType == 'IMAGE'}">
+                                                            <img src="${attachment.fileUrl}" class="img-fluid rounded mb-2" style="max-height: 400px;" alt="Post Image"/>
+                                                        </c:if>
+                                                    </c:forEach>
+                                                </div>
+                                            </c:if>
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="post-actions d-flex justify-content-between align-items-center">
+                                                <div class="d-flex gap-3">
+                                                    <button class="btn-like" onclick="toggleLike(${post.postId})">
+                                                        <i class="fas fa-heart"></i> ${post.likeCount}
+                                                    </button>
+                                                    <button onclick="toggleComments(${post.postId})">
+                                                        <i class="fas fa-comment"></i> ${post.comments.size()}
+                                                    </button>
+                                                    <button onclick="sharePost(${post.postId})">
+                                                        <i class="fas fa-share"></i> ${post.shares.size()}
+                                                    </button>
+                                                </div>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-eye"></i> ${post.privacy}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions (chỉ hiển thị cho profile của chính mình) -->
+        <c:if test="${isOwnProfile}">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card info-card">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-bolt"></i> Thao tác nhanh
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="<c:url value='/profile/settings'/>" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-user-edit"></i><br>
+                                        <small>Chỉnh sửa thông tin</small>
+                                    </a>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="<c:url value='/post/create'/>" class="btn btn-outline-success w-100">
+                                        <i class="fas fa-plus-circle"></i><br>
+                                        <small>Tạo bài viết mới</small>
+                                    </a>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="<c:url value='/profile/search'/>" class="btn btn-outline-secondary w-100">
+                                        <i class="fas fa-search"></i><br>
+                                        <small>Tìm bạn bè</small>
+                                    </a>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="<c:url value='/dashboard'/>" class="btn btn-outline-info w-100">
+                                        <i class="fas fa-home"></i><br>
+                                        <small>Về trang chủ</small>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </c:if>
     </div>
 
     <script src="<c:url value='/assets/js/bootstrap.bundle.min.js'/>"></script>
+    <script>
+        function followUser(userId) {
+            fetch(`/studymate/profile/follow/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data === 'success') {
+                    location.reload();
+                } else {
+                    alert('Có lỗi xảy ra khi theo dõi!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra!');
+            });
+        }
+
+        function unfollowUser(userId) {
+            fetch(`/studymate/profile/unfollow/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data === 'success') {
+                    location.reload();
+                } else {
+                    alert('Có lỗi xảy ra khi bỏ theo dõi!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra!');
+            });
+        }
+
+        function toggleLike(postId) {
+            // Logic để like/unlike bài viết
+            fetch(`/studymate/profile/like/${postId}`, {
+                method: 'POST'
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data === 'success') {
+                    location.reload();
+                }
+            });
+        }
+
+        function sharePost(postId) {
+            fetch(`/studymate/profile/share/${postId}`, {
+                method: 'POST'
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data === 'success') {
+                    alert('Đã chia sẻ bài viết!');
+                    location.reload();
+                }
+            });
+        }
+
+        function deletePost(postId) {
+            if (confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
+                fetch(`/studymate/post/delete/${postId}`, {
+                    method: 'POST'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if (data === 'success') {
+                        location.reload();
+                    } else {
+                        alert('Có lỗi xảy ra khi xóa bài viết!');
+                    }
+                });
+            }
+        }
+    </script>
 </body>
 </html>
