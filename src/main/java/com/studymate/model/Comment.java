@@ -8,6 +8,7 @@ public class Comment {
     private int postId;
     private String content;
     private Date createdAt;
+    private int likeCount; // Thêm để lưu số lượt thích
 
     public Comment() {}
     public Comment(int commentId, int userId, int postId, String content, Date createdAt) {

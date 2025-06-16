@@ -6,4 +6,7 @@ public interface LikeDao {
     int countByPost(int postId) throws Exception;
     int countByPostId(int pid);
     boolean deleteByPostId(int postId) throws Exception;
+    boolean createCommentLike(int userId, int commentId) throws Exception; // Thêm
+    boolean deleteCommentLike(int userId, int commentId) throws Exception; // Thêm
+    int countByComment(int commentId) throws Exception; // Thêm
 }

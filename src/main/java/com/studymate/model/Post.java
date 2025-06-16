@@ -17,6 +17,7 @@ public class Post {
     private List<Comment> comments;
     private int commentCount;
     private List<Share> shares;
+    private int originalPostId; // Thêm để lưu ID bài viết gốc
     // getters & setters
 
     public int getPostId() { return postId; }
@@ -60,5 +61,13 @@ public class Post {
     }
     public void setShares(List<Share> shares) {
         this.shares = shares;
+    }
+    
+    public int getOriginalPostId() { 
+    	return originalPostId; 
+    }
+    
+    public void setOriginalPostId(int originalPostId) { 
+    	this.originalPostId = originalPostId; 
     }
 }

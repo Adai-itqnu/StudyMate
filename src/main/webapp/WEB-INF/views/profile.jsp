@@ -598,6 +598,56 @@
                 });
             }
         }
+        
+        <!-- Trong profile.jsp -->
+        <c:forEach var="post" items="${userPosts}">
+            <div class="post">
+                <h3>${post.title}</h3>
+                <p>${post.body}</p>
+                <c:if test="${post.originalPostId != 0}">
+                    <p>Shared from post ID: ${post.originalPostId}</p>
+                </c:if>
+                <p>Likes: ${post.likeCount}</p>
+                <c:forEach var="comment" items="${post.comments}">
+                    <div class="comment">
+                        <p>${comment.content}</p>
+                        <p>Likes: ${comment.likeCount}</p>
+                        <button onclick="likeComment(${comment.commentId})">Like</button>
+                        <button onclick="unlikeComment(${comment.commentId})">Unlike</button>
+                    </div>
+                </c:forEach>
+            </div>
+        </c:forEach>
+
+        <script>
+        function likeComment(commentId) {
+            fetch('/profile/like-comment/' + commentId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(response => {
+                if (response.ok) {
+                    alert('Liked comment!');
+                    location.reload();
+                } else {
+                    alert('Error liking comment');
+                }
+            });
+        }
+
+        function unlikeComment(commentId) {
+            fetch('/profile/unlike-comment/' + commentId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(response => {
+                if (response.ok) {
+                    alert('Unliked comment!');
+                    location.reload();
+                } else {
+                    alert('Error unliking comment');
+                }
+            });
+        }
+        
     </script>
 </body>
 </html>

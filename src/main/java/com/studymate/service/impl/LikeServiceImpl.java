@@ -21,4 +21,19 @@ public class LikeServiceImpl implements LikeService {
     public int countLikes(int postId) throws Exception {
         return likeDao.countByPost(postId);
     }
+
+    @Override
+    public boolean likeComment(int userId, int commentId) throws Exception {
+        return likeDao.createCommentLike(userId, commentId);
+    }
+
+    @Override
+    public boolean unlikeComment(int userId, int commentId) throws Exception {
+        return likeDao.deleteCommentLike(userId, commentId);
+    }
+
+    @Override
+    public int countCommentLikes(int commentId) throws Exception {
+        return likeDao.countByComment(commentId);
+    }
 }

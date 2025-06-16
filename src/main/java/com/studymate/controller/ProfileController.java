@@ -2,6 +2,7 @@ package com.studymate.controller;
 
 import com.studymate.model.Post;
 import com.studymate.model.User;
+import com.studymate.model.Comment;
 import com.studymate.service.PostService;
 import com.studymate.service.UserService;
 import com.studymate.service.FollowService;
@@ -67,7 +68,11 @@ public class ProfileController {
         // Đếm like, comment, share cho từng bài
         for (Post post : userPosts) {
             post.setLikeCount(likeService.countLikes(post.getPostId()));
-            post.setComments(commentService.getCommentsByPost(post.getPostId()));
+            List<Comment> comments = commentService.getCommentsByPost(post.getPostId());
+            for (Comment comment : comments) {
+                comment.setLikeCount(likeService.countCommentLikes(comment.getCommentId()));
+            }
+            post.setComments(comments);
             post.setShares(shareService.getSharesByPost(post.getPostId()));
         }
 
@@ -154,6 +159,36 @@ public class ProfileController {
         }
     }
 
+    @PostMapping("/like-comment/{commentId}")
+    @ResponseBody
+    public String likeComment(@PathVariable int commentId, HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return "error";
+            }
+            likeService.likeComment(currentUser.getUserId(), commentId);
+            return "success";
+        } catch (Exception e) {
+            return "error";
+        }
+    }
+
+    @PostMapping("/unlike-comment/{commentId}")
+    @ResponseBody
+    public String unlikeComment(@PathVariable int commentId, HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return "error";
+            }
+            likeService.unlikeComment(currentUser.getUserId(), commentId);
+            return "success";
+        } catch (Exception e) {
+            return "error";
+        }
+    }
+
     @PostMapping("/share/{postId}")
     @ResponseBody
     public String sharePost(@PathVariable int postId, HttpSession session) {
@@ -187,7 +222,6 @@ public class ProfileController {
                 List<User> searchResults = searchService.searchUsers(query.trim());
                 model.addAttribute("userResults", searchResults);
             }
-            // Có thể thêm search posts sau
         }
 
         model.addAttribute("query", query);

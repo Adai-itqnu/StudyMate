@@ -176,3 +176,14 @@ INSERT INTO schools (name) VALUES
 ('THPT Nguyễn Bỉnh Khiêm'),
 ('THPT Phan Bội Châu');
 
+-- Thêm cột comment_id vào bảng likes để hỗ trợ lượt thích bình luận
+ALTER TABLE likes ADD COLUMN comment_id INT NULL;
+ALTER TABLE likes ADD CONSTRAINT fk_comment FOREIGN KEY (comment_id) REFERENCES comments(comment_id);
+
+-- Thêm cột original_post_id vào bảng posts để hỗ trợ bài viết chia sẻ
+ALTER TABLE posts ADD COLUMN original_post_id INT NULL;
+ALTER TABLE posts ADD CONSTRAINT fk_original_post FOREIGN KEY (original_post_id) REFERENCES posts(post_id);
+
+-- Cập nhật ràng buộc primary key của bảng likes để bao gồm comment_id
+ALTER TABLE likes DROP CONSTRAINT likes_pkey;
+ALTER TABLE likes ADD CONSTRAINT likes_pkey PRIMARY KEY (user_id, post_id, comment_id);
