@@ -5,8 +5,16 @@ import com.studymate.model.Post;
 import com.studymate.model.User;
 import com.studymate.service.PostService;
 import com.studymate.service.impl.PostServiceImpl;
+import com.studymate.service.LikeService;
+import com.studymate.service.ShareService;
+import com.studymate.service.impl.LikeServiceImpl;
+import com.studymate.service.impl.ShareServiceImpl;
+import com.studymate.model.Comment;
+import com.studymate.service.CommentService;
+import com.studymate.service.impl.CommentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +30,9 @@ import java.nio.file.StandardCopyOption;
 @RequestMapping("/posts")
 public class PostController {
     private final PostService postService = new PostServiceImpl();
+    private final LikeService likeService = new LikeServiceImpl();
+    private final ShareService shareService = new ShareServiceImpl();
+    private final CommentService commentService = new CommentServiceImpl();
 
     @PostMapping("/create")
     public String createPost(
@@ -93,5 +104,51 @@ public class PostController {
         System.out.println("Post created with ID: " + postId);
 
         return "redirect:/dashboard";
+    }
+
+    @PostMapping("/like/{postId}")
+    @ResponseBody
+    public ResponseEntity<?> likePost(@PathVariable int postId, HttpSession session) {
+        try {
+            User current = (User) session.getAttribute("currentUser");
+            if (current == null) return ResponseEntity.status(401).body("error");
+            boolean liked = likeService.likePost(current.getUserId(), postId);
+            int likeCount = likeService.countLikes(postId);
+            return ResponseEntity.ok().body("{\"success\":true,\"likeCount\":" + likeCount + ",\"liked\":" + liked + "}");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("error");
+        }
+    }
+
+    @PostMapping("/share/{postId}")
+    @ResponseBody
+    public String sharePost(@PathVariable int postId, HttpSession session) {
+        try {
+            User current = (User) session.getAttribute("currentUser");
+            if (current == null) return "error";
+            shareService.sharePost(current.getUserId(), postId);
+            return "success";
+        } catch (Exception e) {
+            return "error";
+        }
+    }
+
+    @PostMapping("/comment")
+    @ResponseBody
+    public ResponseEntity<?> commentPost(@RequestParam int postId, @RequestParam String content, HttpSession session) {
+        try {
+            User current = (User) session.getAttribute("currentUser");
+            if (current == null) return ResponseEntity.status(401).body("error");
+            Comment comment = new Comment();
+            comment.setUserId(current.getUserId());
+            comment.setPostId(postId);
+            comment.setContent(content);
+            int commentId = commentService.addComment(comment);
+            comment.setCommentId(commentId);
+            comment.setCreatedAt(new java.util.Date());
+            return ResponseEntity.ok().body(comment);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("error");
+        }
     }
 }

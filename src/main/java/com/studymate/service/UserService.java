@@ -34,4 +34,9 @@ public interface UserService {
      * Cập nhật mật khẩu user
      */
     boolean updatePassword(int userId, String oldPassword, String newPassword) throws Exception;
+
+    /**
+     * Lấy danh sách gợi ý theo dõi cho một user cụ thể
+     */
+    List<User> getFollowSuggestions(int userId) throws Exception;
 }

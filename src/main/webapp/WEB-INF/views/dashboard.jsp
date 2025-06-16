@@ -172,20 +172,39 @@
 	                                
 	                                <!-- Post Actions -->
 	                                <div class="d-flex justify-content-between border-top pt-3">
-	                                    <button class="btn btn-outline-primary btn-sm" 
-	                                            onclick="likePost(${post.postId})">
+	                                    <button class="btn btn-outline-primary btn-sm" onclick="likePost(${post.postId})">
 	                                        <i class="fas fa-heart"></i> Like
 	                                        <span id="like-count-${post.postId}">${post.likeCount}</span>
 	                                    </button>
-	                                    <button class="btn btn-outline-secondary btn-sm">
+	                                    <button class="btn btn-outline-secondary btn-sm" type="button" onclick="toggleCommentBox(${post.postId})">
 	                                        <i class="fas fa-comment"></i> Comment
 	                                        <span>${post.comments != null ? post.comments.size() : 0}</span>
 	                                    </button>
-	                                    <button class="btn btn-outline-success btn-sm" 
-	                                            onclick="sharePost(${post.postId})">
+	                                    <button class="btn btn-outline-success btn-sm" onclick="sharePost(${post.postId})">
 	                                        <i class="fas fa-share"></i> Share
 	                                        <span>${post.shares != null ? post.shares.size() : 0}</span>
 	                                    </button>
+	                                </div>
+	                                <!-- Comment Section -->
+	                                <div class="comment-section mt-3" id="comment-section-${post.postId}" style="display:none;">
+	                                    <!-- List comments -->
+	                                    <c:forEach var="comment" items="${post.comments}">
+	                                        <div class="d-flex align-items-start mb-2">
+	                                            <img src="/assets/images/default-avatar.png" class="avatar me-2" style="width:32px;height:32px;">
+	                                            <div>
+	                                                <b>User ${comment.userId}</b>
+	                                                <span class="text-muted small ms-2">
+	                                                    <fmt:formatDate value="${comment.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+	                                                </span><br>
+	                                                <span>${comment.content}</span>
+	                                            </div>
+	                                        </div>
+	                                    </c:forEach>
+	                                    <!-- Add comment form -->
+	                                    <form class="d-flex mt-2" onsubmit="return submitComment(event, ${post.postId})">
+	                                        <textarea class="form-control me-2" id="comment-input-${post.postId}" rows="1" placeholder="Viết bình luận..." required style="border-radius:12px;"></textarea>
+	                                        <button type="submit" class="btn btn-primary" style="border-radius:12px;">Gửi</button>
+	                                    </form>
 	                                </div>
 	                            </div>
 	                        </c:forEach>
@@ -208,6 +227,7 @@
 	                        <i class="fas fa-tools"></i> Tính năng
 	                    </h5>
 	                    
+	                    <!-- 1. Tạo lịch học -->
 	                    <div class="feature-card" onclick="window.location.href='#'">
 	                        <div class="d-flex align-items-center">
 	                            <i class="fas fa-calendar-alt text-primary fa-2x me-3"></i>
@@ -218,7 +238,8 @@
 	                        </div>
 	                    </div>
 	                    
-	                    <div class="feature-card" onclick="window.location.href='#'">
+	                    <!-- 2. Xem ghi chú -->
+	                    <div class="feature-card" onclick="window.location.href='<c:url value="/notes"/>'">
 	                        <div class="d-flex align-items-center">
 	                            <i class="fas fa-sticky-note text-warning fa-2x me-3"></i>
 	                            <div>
@@ -228,9 +249,10 @@
 	                        </div>
 	                    </div>
 	                    
+	                    <!-- 3. Xem task -->
 	                    <div class="feature-card" onclick="window.location.href='#'">
 	                        <div class="d-flex align-items-center">
-	                            <i class="fas fa-tasks text-success fa-2x me-3"></i>
+	                            <i class="fas fa-list-check text-success fa-2x me-3"></i>
 	                            <div>
 	                                <h6 class="mb-1">Xem task</h6>
 	                                <small class="text-muted">Theo dõi công việc</small>
@@ -238,9 +260,10 @@
 	                        </div>
 	                    </div>
 	                    
-	                    <div class="feature-card" onclick="window.location.href='#'">
+	                    <!-- 4. Thư viện tài liệu -->
+	                    <div class="feature-card" onclick="window.location.href='<c:url value="/documents"/>'">
 	                        <div class="d-flex align-items-center">
-	                            <i class="fas fa-book text-info fa-2x me-3"></i>
+	                            <i class="fas fa-book-open text-info fa-2x me-3"></i>
 	                            <div>
 	                                <h6 class="mb-1">Thư viện tài liệu</h6>
 	                                <small class="text-muted">Tài liệu học tập</small>
@@ -248,21 +271,23 @@
 	                        </div>
 	                    </div>
 	                    
-	                    <div class="feature-card" onclick="window.location.href='#'">
-	                        <div class="d-flex align-items-center">
-	                            <i class="fas fa-users text-purple fa-2x me-3"></i>
-	                            <div>
-	                                <h6 class="mb-1">Nhóm học tập</h6>
-	                                <small class="text-muted">Tham gia nhóm học</small>
-	                            </div>
-	                        </div>
-	                    </div>
+	                    <!-- 5. Nhóm học tập -->
+	                    <div class="feature-card" onclick="window.location.href='<c:url value="/rooms"/>'">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-users text-primary fa-2x me-3"></i>
+                            <div>
+                                <h6 class="mb-1">Nhóm học tập</h6>
+                                <small class="text-muted">Tham gia nhóm học</small>
+                            </div>
+                        </div>
+                    </div>
 	                    
+	                    <!-- 6. Thống kê quá trình học tập -->
 	                    <div class="feature-card" onclick="window.location.href='#'">
 	                        <div class="d-flex align-items-center">
 	                            <i class="fas fa-chart-line text-danger fa-2x me-3"></i>
 	                            <div>
-	                                <h6 class="mb-1">Thống kê học tập</h6>
+	                                <h6 class="mb-1">Thống kê quá trình học tập</h6>
 	                                <small class="text-muted">Theo dõi tiến độ</small>
 	                            </div>
 	                        </div>
@@ -337,7 +362,7 @@
 	        }
 	
 	        function likePost(postId) {
-	            fetch(`/profile/like/${postId}`, {
+	            fetch(`/posts/like/${postId}`, {
 	                method: 'POST',
 	                headers: {
 	                    'Content-Type': 'application/json',
@@ -355,7 +380,7 @@
 	        }
 	
 	        function sharePost(postId) {
-	            fetch(`/profile/share/${postId}`, {
+	            fetch(`/posts/share/${postId}`, {
 	                method: 'POST',
 	                headers: {
 	                    'Content-Type': 'application/json',
@@ -374,6 +399,45 @@
 	
 	        function closeSearchModal() {
 	            window.location.href = '/dashboard';
+	        }
+	
+	        function toggleCommentBox(postId) {
+	            const section = document.getElementById(`comment-section-${postId}`);
+	            if (section.style.display === 'none') {
+	                section.style.display = 'block';
+	            } else {
+	                section.style.display = 'none';
+	            }
+	        }
+	
+	        function submitComment(event, postId) {
+	            event.preventDefault();
+	            const textarea = document.getElementById(`comment-input-${postId}`);
+	            const content = textarea.value.trim();
+	            if (!content) return false;
+	            fetch(`/posts/comment`, {
+	                method: 'POST',
+	                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	                body: `postId=${postId}&content=${encodeURIComponent(content)}`
+	            })
+	            .then(res => res.json())
+	            .then(comment => {
+	                // Thêm comment mới vào đầu danh sách
+	                const section = document.getElementById(`comment-section-${postId}`);
+	                const newComment = document.createElement('div');
+	                newComment.className = 'd-flex align-items-start mb-2';
+	                newComment.innerHTML = `
+	                    <img src="/assets/images/default-avatar.png" class="avatar me-2" style="width:32px;height:32px;">
+	                    <div>
+	                        <b>User ${comment.userId}</b>
+	                        <span class="text-muted small ms-2">Vừa xong</span><br>
+	                        <span>${comment.content}</span>
+	                    </div>
+	                `;
+	                section.insertBefore(newComment, section.querySelector('form'));
+	                textarea.value = '';
+	            });
+	            return false;
 	        }
 	    </script>
 	</body>

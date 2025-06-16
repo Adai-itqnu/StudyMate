@@ -21,4 +21,7 @@ public interface UserDao {
 
     // Lấy tất cả user (nếu cần)
     List<User> findAll() throws Exception;
+
+    // Lấy danh sách gợi ý theo dõi
+    List<User> getFollowSuggestions(int userId) throws Exception;
 }

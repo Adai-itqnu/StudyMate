@@ -147,15 +147,11 @@
         // Like post function
         function likePost(postId) {
             if (isLoading) return;
-            
             const likeBtn = document.querySelector(`button[onclick="likePost(${postId})"]`);
             const likeCount = document.getElementById(`like-count-${postId}`);
-            
             if (!likeBtn || !likeCount) return;
-            
             showLoading(true);
-            
-            fetch(`<c:url value='/posts/like/'/>` + postId, {
+            fetch(`/posts/like/` + postId, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -166,7 +162,6 @@
             .then(data => {
                 if (data.success) {
                     likeCount.textContent = data.likeCount;
-                    
                     if (data.liked) {
                         likeBtn.classList.add('liked');
                         likeBtn.querySelector('i').classList.replace('far', 'fas');
@@ -192,11 +187,9 @@
         // Share post function
         function sharePost(postId) {
             if (isLoading) return;
-            
             if (confirm('Bạn có muốn chia sẻ bài viết này không?')) {
                 showLoading(true);
-                
-                fetch(`<c:url value='/posts/share/'/>` + postId, {
+                fetch(`/posts/share/` + postId, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -207,9 +200,7 @@
                 .then(data => {
                     if (data === 'success') {
                         showNotification('Đã chia sẻ bài viết!', 'success');
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1000);
+                        setTimeout(() => { location.reload(); }, 1000);
                     } else {
                         showNotification('Có lỗi xảy ra khi chia sẻ!', 'error');
                     }
@@ -446,3 +437,42 @@
                 card.addEventListener('click', () => navigateToFeature(features[index]));
             });
         });
+
+        // Thêm các hàm comment cho bài viết
+        function toggleCommentBox(postId) {
+            const section = document.getElementById(`comment-section-${postId}`);
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+        function submitComment(event, postId) {
+            event.preventDefault();
+            const textarea = document.getElementById(`comment-input-${postId}`);
+            const content = textarea.value.trim();
+            if (!content) return false;
+            fetch(`/posts/comment`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `postId=${postId}&content=${encodeURIComponent(content)}`
+            })
+            .then(res => res.json())
+            .then(comment => {
+                // Thêm comment mới vào đầu danh sách
+                const section = document.getElementById(`comment-section-${postId}`);
+                const newComment = document.createElement('div');
+                newComment.className = 'd-flex align-items-start mb-2';
+                newComment.innerHTML = `
+                    <img src="/assets/images/default-avatar.png" class="avatar me-2" style="width:32px;height:32px;">
+                    <div>
+                        <b>User ${comment.userId}</b>
+                        <span class="text-muted small ms-2">Vừa xong</span><br>
+                        <span>${comment.content}</span>
+                    </div>
+                `;
+                section.insertBefore(newComment, section.querySelector('form'));
+                textarea.value = '';
+            });
+            return false;
+        }
