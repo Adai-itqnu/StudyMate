@@ -81,11 +81,15 @@ CREATE TABLE tasks (
     task_id     INT AUTO_INCREMENT PRIMARY KEY,
     user_id     INT NOT NULL,
     title       VARCHAR(255) NOT NULL,
+    description TEXT,
     due_date    DATE,
     status      ENUM('PENDING','DONE') DEFAULT 'PENDING',
+    is_pinned   BOOLEAN DEFAULT FALSE,
+    parent_id   INT NULL, -- Để tạo subtask
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (parent_id) REFERENCES tasks(task_id) ON DELETE CASCADE
 );
 
 -- Bảng likes
@@ -104,16 +108,6 @@ CREATE TABLE comments (
     user_id     INT,
     post_id     INT,
     content     TEXT NOT NULL,
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (post_id) REFERENCES posts(post_id)
-);
-
--- Bảng shares
-CREATE TABLE shares (
-    share_id    INT AUTO_INCREMENT PRIMARY KEY,
-    user_id     INT,
-    post_id     INT,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (post_id) REFERENCES posts(post_id)

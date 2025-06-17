@@ -148,6 +148,26 @@ public class UserDaoImpl implements UserDao {
         }
         return list;
     }
+    
+    @Override
+    public List<User> getFollowSuggestions(int userId) throws Exception {
+        String sql = "SELECT u.* FROM users u " +
+                     "WHERE u.user_id != ? " +
+                     "AND u.user_id NOT IN (SELECT f.followee_id FROM follows f WHERE f.follower_id = ?) " +
+                     "ORDER BY RAND() LIMIT 5"; // Lấy ngẫu nhiên 5 gợi ý
+        List<User> suggestions = new ArrayList<>();
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    suggestions.add(mapRowToUser(rs));
+                }
+            }
+        }
+        return suggestions;
+    }
 
     private User mapRowToUser(ResultSet rs) throws SQLException {
         User u = new User();

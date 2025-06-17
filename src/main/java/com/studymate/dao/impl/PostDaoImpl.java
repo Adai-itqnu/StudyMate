@@ -16,7 +16,7 @@ public class PostDaoImpl implements PostDao {
     private final AttachmentDao attachmentDao = new AttachmentDaoImpl();
     private final LikeDao likeDao             = new LikeDaoImpl();
     private final CommentDao commentDao       = new CommentDaoImpl();
-    private final ShareDao shareDao           = new ShareDaoImpl();
+    
     private static final String INSERT_SQL =
       "INSERT INTO posts (user_id, title, body, privacy, status) VALUES (?,?,?,?, 'PUBLISHED')";
     private static final String SELECT_ALL =
@@ -76,8 +76,6 @@ public class PostDaoImpl implements PostDao {
             List<Comment> cmts = commentDao.findByPostId(pid);
             p.setComments(cmts);
             p.setCommentCount(cmts.size());
-            // shares
-            p.setShares(shareDao.findByPostId(pid));
         }	
         return posts;
     }
@@ -149,4 +147,31 @@ public class PostDaoImpl implements PostDao {
             }
         }
     }
+    
+    @Override
+    public Post findById(int postId) {
+        Post post = null;
+        String sql = "SELECT * FROM posts WHERE id = ?";
+        
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+             
+            ps.setInt(1, postId);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                post = new Post();
+                post.setPostId(postId);
+                post.setTitle(rs.getString("title"));
+                post.setBody(rs.getString("body"));
+                post.setCreatedAt(rs.getTimestamp("created_at"));
+                // Thêm các field cần thiết khác
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return post;
+    }
+
 }

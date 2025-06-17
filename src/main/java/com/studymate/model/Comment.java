@@ -8,8 +8,16 @@ public class Comment {
     private int postId;
     private String content;
     private Date createdAt;
-
-    public Comment() {}
+    private User user;
+    private String userFullName;
+    
+    public String getUserFullName() {
+		return userFullName;
+	}
+	public void setUserFullName(String userFullName) {
+		this.userFullName = userFullName;
+	}
+	public Comment() {}
     public Comment(int commentId, int userId, int postId, String content, Date createdAt) {
         this.commentId = commentId;
         this.userId = userId;
@@ -28,4 +36,6 @@ public class Comment {
     public void setContent(String content) { this.content = content; }
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

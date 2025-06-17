@@ -8,4 +8,5 @@ public interface PostDao {
     List<Post> findAll() throws Exception;
     List<Post> findAllWithDetails() throws Exception;
     boolean delete(int postId) throws Exception;
+    Post findById(int postId);
 }

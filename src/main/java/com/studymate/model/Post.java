@@ -16,7 +16,18 @@ public class Post {
     private int likeCount;         
     private List<Comment> comments;
     private int commentCount;
-    private List<Share> shares;
+    private User user;
+    
+    // Thêm các thuộc tính mới cho user info
+    private String userAvatar;
+    private String userFullName;
+    
+    // Thêm thuộc tính để kiểm tra like của user hiện tại
+    private boolean likedByCurrentUser;
+    
+    // Thêm thuộc tính cho bài viết gốc khi share
+    private int originalPostId;
+
     // getters & setters
 
     public int getPostId() { return postId; }
@@ -55,10 +66,38 @@ public class Post {
     public int getCommentCount() { return commentCount; }
     public void setCommentCount(int commentCount) { this.commentCount = commentCount; }
     
-    public List<Share> getShares() {
-        return shares;
+    
+    public String getUserAvatar() {
+        return userAvatar;
     }
-    public void setShares(List<Share> shares) {
-        this.shares = shares;
+    
+    public void setUserAvatar(String userAvatar) {
+        this.userAvatar = userAvatar;
     }
+    
+    public String getUserFullName() {
+        return userFullName;
+    }
+    
+    public void setUserFullName(String userFullName) {
+        this.userFullName = userFullName;
+    }
+    
+    public boolean isLikedByCurrentUser() {
+        return likedByCurrentUser;
+    }
+    
+    public void setLikedByCurrentUser(boolean likedByCurrentUser) {
+        this.likedByCurrentUser = likedByCurrentUser;
+    }
+    
+    public int getOriginalPostId() {
+        return originalPostId;
+    }
+    
+    public void setOriginalPostId(int originalPostId) {
+        this.originalPostId = originalPostId;
+    }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

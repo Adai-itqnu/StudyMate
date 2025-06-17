@@ -6,4 +6,5 @@ public interface LikeDao {
     int countByPost(int postId) throws Exception;
     int countByPostId(int pid);
     boolean deleteByPostId(int postId) throws Exception;
+    boolean isLiked(int userId, int postId) throws Exception;
 }

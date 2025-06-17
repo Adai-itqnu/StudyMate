@@ -15,6 +15,8 @@ public class FollowDaoImpl implements FollowDao {
         "SELECT u.* FROM users u JOIN follows f ON u.user_id=f.follower_id WHERE f.followee_id=?";
     private static final String SELECT_FOLLOWEES =
         "SELECT u.* FROM users u JOIN follows f ON u.user_id=f.followee_id WHERE f.follower_id=?";
+    private static final String CHECK_FOLLOWING = 
+        "SELECT COUNT(*) FROM follows WHERE follower_id=? AND followee_id=?";
 
     @Override
     public boolean create(int followerId, int followeeId) throws Exception {
@@ -64,6 +66,21 @@ public class FollowDaoImpl implements FollowDao {
             }
         }
         return list;
+    }
+    
+    @Override
+    public boolean isFollowing(int followerId, int followeeId) throws Exception {
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(CHECK_FOLLOWING)) {
+            ps.setInt(1, followerId);
+            ps.setInt(2, followeeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
     }
 
     private User mapRow(ResultSet rs) throws SQLException {

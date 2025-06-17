@@ -15,7 +15,6 @@ public class PostServiceImpl implements PostService {
     private final AttachmentDao attachmentDao = new AttachmentDaoImpl();
     private final LikeDao likeDao             = new LikeDaoImpl();
     private final CommentDao commentDao       = new CommentDaoImpl();
-    private final ShareDao shareDao           = new ShareDaoImpl();
 
     @Override
     public int create(Post post, String fileUrl) throws Exception {
@@ -29,7 +28,12 @@ public class PostServiceImpl implements PostService {
         }
         return postId;
     }
-
+    
+    @Override
+    public Post findById(int postId) {
+        return postDao.findById(postId);
+    }
+    
     @Override
     public List<Post> findAll() throws Exception {
         List<Post> posts = postDao.findAll();
@@ -49,15 +53,12 @@ public class PostServiceImpl implements PostService {
             List<Comment> cmts = commentDao.findByPostId(pid);
             p.setComments(cmts);
             p.setCommentCount(cmts.size());
-            p.setShares(shareDao.findByPostId(pid));
         }
         return posts;
     }
 
     @Override
     public void delete(int postId) throws Exception {
-        // Sử dụng transaction để đảm bảo tính toàn vẹn dữ liệu
-        // Chỉ cần gọi postDao.delete() vì nó đã xử lý transaction
         boolean success = postDao.delete(postId);
         if (!success) {
             throw new Exception("Failed to delete post with ID: " + postId);

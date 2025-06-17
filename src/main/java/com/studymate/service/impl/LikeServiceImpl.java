@@ -21,4 +21,9 @@ public class LikeServiceImpl implements LikeService {
     public int countLikes(int postId) throws Exception {
         return likeDao.countByPost(postId);
     }
+
+    @Override
+    public boolean isLiked(int userId, int postId) throws Exception {
+        return likeDao.isLiked(userId, postId);
+    }
 }

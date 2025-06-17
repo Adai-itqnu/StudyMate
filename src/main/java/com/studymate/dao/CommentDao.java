@@ -8,4 +8,5 @@ public interface CommentDao {
     boolean delete(int commentId) throws Exception;
     List<Comment> findByPostId(int postId) throws Exception;
     boolean deleteByPostId(int postId) throws Exception;
+    boolean updateComment(int commentId, String content) throws Exception;
 }

@@ -8,4 +8,5 @@ public interface FollowService {
     boolean unfollow(int followerId, int followeeId) throws Exception;
     List<User> getFollowers(int userId) throws Exception;
     List<User> getFollowees(int userId) throws Exception;
+    boolean isFollowing(int followerId, int followeeId) throws Exception;
 }

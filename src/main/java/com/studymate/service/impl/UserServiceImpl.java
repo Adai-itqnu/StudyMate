@@ -73,7 +73,10 @@ public class UserServiceImpl implements UserService {
         user.setPassword(PasswordUtil.hash(newPassword));
         return userDao.update(user);
     }
-    
+    @Override
+    public List<User> getFollowSuggestions(int userId) throws Exception {
+        return userDao.getFollowSuggestions(userId);
+    }
     @Override
     public boolean deleteUser(int userId) throws Exception {
         return userDao.delete(userId);

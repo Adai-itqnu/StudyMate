@@ -7,19 +7,18 @@ import com.studymate.service.UserService;
 import com.studymate.service.FollowService;
 import com.studymate.service.LikeService;
 import com.studymate.service.CommentService;
-import com.studymate.service.ShareService;
 import com.studymate.service.SearchService;
 import com.studymate.service.impl.PostServiceImpl;
 import com.studymate.service.impl.UserServiceImpl;
 import com.studymate.service.impl.FollowServiceImpl;
 import com.studymate.service.impl.LikeServiceImpl;
 import com.studymate.service.impl.CommentServiceImpl;
-import com.studymate.service.impl.ShareServiceImpl;
 import com.studymate.service.impl.SearchServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +32,6 @@ public class ProfileController {
     private final FollowService followService = new FollowServiceImpl();
     private final LikeService likeService = new LikeServiceImpl();
     private final CommentService commentService = new CommentServiceImpl();
-    private final ShareService shareService = new ShareServiceImpl();
     private final SearchService searchService = new SearchServiceImpl();
 
     @GetMapping
@@ -53,29 +51,23 @@ public class ProfileController {
             return "redirect:/login";
         }
 
-        // Lấy thông tin user được xem
         User profileUser = userService.findById(userId);
         if (profileUser == null) {
             return "redirect:/dashboard";
         }
 
-        // Lấy bài viết của user này
         List<Post> userPosts = postService.findAll().stream()
             .filter(p -> p.getUserId() == userId)
             .collect(Collectors.toList());
 
-        // Đếm like, comment, share cho từng bài
         for (Post post : userPosts) {
             post.setLikeCount(likeService.countLikes(post.getPostId()));
             post.setComments(commentService.getCommentsByPost(post.getPostId()));
-            post.setShares(shareService.getSharesByPost(post.getPostId()));
         }
 
-        // Lấy thông tin theo dõi
         List<User> followers = followService.getFollowers(userId);
         List<User> followees = followService.getFollowees(userId);
         
-        // Kiểm tra xem current user có đang theo dõi profile user không
         boolean isFollowing = followers.stream()
             .anyMatch(f -> f.getUserId() == currentUser.getUserId());
 
@@ -91,82 +83,145 @@ public class ProfileController {
     }
 
     @PostMapping("/follow/{userId}")
-    @ResponseBody
-    public String followUser(@PathVariable int userId, HttpSession session) {
+    public String followUser(
+        @PathVariable int userId, 
+        HttpSession session,
+        RedirectAttributes redirectAttributes
+    ) {
         try {
             User currentUser = (User) session.getAttribute("currentUser");
             if (currentUser == null) {
-                return "error";
+                return "redirect:/login";
             }
 
-            followService.follow(currentUser.getUserId(), userId);
-            return "success";
+            if (currentUser.getUserId() == userId) {
+                redirectAttributes.addFlashAttribute("error", "Không thể theo dõi chính mình");
+                return "redirect:/profile/" + userId;
+            }
+
+            boolean followed = followService.follow(currentUser.getUserId(), userId);
+            if (followed) {
+                redirectAttributes.addFlashAttribute("message", "Đã theo dõi thành công!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Không thể theo dõi");
+            }
         } catch (Exception e) {
-            return "error";
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
         }
+        return "redirect:/profile/" + userId;
     }
 
     @PostMapping("/unfollow/{userId}")
-    @ResponseBody
-    public String unfollowUser(@PathVariable int userId, HttpSession session) {
+    public String unfollowUser(
+        @PathVariable int userId, 
+        HttpSession session,
+        RedirectAttributes redirectAttributes
+    ) {
         try {
             User currentUser = (User) session.getAttribute("currentUser");
             if (currentUser == null) {
-                return "error";
+                return "redirect:/login";
             }
 
-            followService.unfollow(currentUser.getUserId(), userId);
-            return "success";
+            boolean unfollowed = followService.unfollow(currentUser.getUserId(), userId);
+            if (unfollowed) {
+                redirectAttributes.addFlashAttribute("message", "Đã hủy theo dõi");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Không thể hủy theo dõi");
+            }
         } catch (Exception e) {
-            return "error";
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
         }
+        return "redirect:/profile/" + userId;
     }
 
     @PostMapping("/like/{postId}")
-    @ResponseBody
-    public String likePost(@PathVariable int postId, HttpSession session) {
+    public String likePost(
+        @PathVariable int postId, 
+        @RequestParam(required = false) Integer profileUserId,
+        HttpSession session,
+        RedirectAttributes redirectAttributes
+    ) {
         try {
             User currentUser = (User) session.getAttribute("currentUser");
             if (currentUser == null) {
-                return "error";
+                return "redirect:/login";
             }
 
-            likeService.likePost(currentUser.getUserId(), postId);
-            return "success";
+            boolean isLiked = likeService.isLiked(currentUser.getUserId(), postId);
+            
+            if (isLiked) {
+                boolean unliked = likeService.unlikePost(currentUser.getUserId(), postId);
+                if (unliked) {
+                    redirectAttributes.addFlashAttribute("message", "Đã bỏ like bài viết");
+                } else {
+                    redirectAttributes.addFlashAttribute("error", "Không thể bỏ like");
+                }
+            } else {
+                boolean liked = likeService.likePost(currentUser.getUserId(), postId);
+                if (liked) {
+                    redirectAttributes.addFlashAttribute("message", "Đã like bài viết");
+                } else {
+                    redirectAttributes.addFlashAttribute("error", "Không thể like bài viết");
+                }
+            }
         } catch (Exception e) {
-            return "error";
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
         }
-    }
-
-    @PostMapping("/unlike/{postId}")
-    @ResponseBody
-    public String unlikePost(@PathVariable int postId, HttpSession session) {
-        try {
-            User currentUser = (User) session.getAttribute("currentUser");
-            if (currentUser == null) {
-                return "error";
-            }
-
-            likeService.unlikePost(currentUser.getUserId(), postId);
-            return "success";
-        } catch (Exception e) {
-            return "error";
+        
+        // Redirect về profile của user được chỉ định hoặc về profile hiện tại
+        if (profileUserId != null) {
+            return "redirect:/profile/" + profileUserId;
+        } else {
+            return "redirect:/profile";
         }
     }
 
     @PostMapping("/share/{postId}")
-    @ResponseBody
-    public String sharePost(@PathVariable int postId, HttpSession session) {
+    public String sharePost(
+        @PathVariable int postId,
+        @RequestParam(required = false) Integer profileUserId,
+        HttpSession session,
+        RedirectAttributes redirectAttributes
+    ) {
         try {
             User currentUser = (User) session.getAttribute("currentUser");
             if (currentUser == null) {
-                return "error";
+                return "redirect:/login";
             }
 
-            shareService.sharePost(currentUser.getUserId(), postId);
-            return "success";
+            // Lấy thông tin bài viết gốc
+            Post originalPost = postService.findById(postId);
+            if (originalPost == null) {
+                redirectAttributes.addFlashAttribute("error", "Bài viết không tồn tại");
+                return "redirect:/profile";
+            }
+
+            // Kiểm tra không được share bài viết của chính mình
+            if (originalPost.getUserId() == currentUser.getUserId()) {
+                redirectAttributes.addFlashAttribute("error", "Không thể chia sẻ bài viết của chính mình");
+                return "redirect:/profile";
+            }
+
+            // Tạo bài viết share mới
+            Post sharedPost = new Post();
+            sharedPost.setUserId(currentUser.getUserId());
+            sharedPost.setTitle("Đã chia sẻ: " + originalPost.getTitle());
+            sharedPost.setBody("Chia sẻ từ User " + originalPost.getUserId() + ":\n\n" + originalPost.getBody());
+            sharedPost.setPrivacy("PUBLIC");
+            
+            int newPostId = postService.create(sharedPost, null);
+
+            
         } catch (Exception e) {
-            return "error";
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+        }
+        
+        // Redirect về profile của user được chỉ định hoặc về profile hiện tại
+        if (profileUserId != null) {
+            return "redirect:/profile/" + profileUserId;
+        } else {
+            return "redirect:/profile";
         }
     }
 
@@ -187,7 +242,6 @@ public class ProfileController {
                 List<User> searchResults = searchService.searchUsers(query.trim());
                 model.addAttribute("userResults", searchResults);
             }
-            // Có thể thêm search posts sau
         }
 
         model.addAttribute("query", query);

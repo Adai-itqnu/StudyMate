@@ -24,4 +24,8 @@ public class CommentServiceImpl implements CommentService {
     public List<Comment> getCommentsByPost(int postId) throws Exception {
         return commentDao.findByPostId(postId);
     }
+    @Override
+    public boolean updateComment(int commentId, String content) throws Exception {
+        return commentDao.updateComment(commentId, content);
+    }
 }

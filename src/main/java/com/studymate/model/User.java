@@ -19,6 +19,9 @@ public class User {
     private String status;
     private boolean systemAdmin;
     
+    // Thêm thuộc tính để kiểm tra trạng thái follow
+    private boolean followed;
+    
     public User() {}
 
     // getters và setters
@@ -52,4 +55,12 @@ public class User {
     public void setSystemAdmin(boolean systemAdmin) { this.systemAdmin = systemAdmin; }
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
+   
+    public boolean isFollowed() {
+        return followed;
+    }
+    
+    public void setFollowed(boolean followed) {
+        this.followed = followed;
+    }
 }

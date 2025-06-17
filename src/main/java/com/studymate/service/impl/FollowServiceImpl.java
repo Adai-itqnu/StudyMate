@@ -29,4 +29,9 @@ public class FollowServiceImpl implements FollowService {
     public List<User> getFollowees(int userId) throws Exception {
         return followDao.findFollowees(userId);
     }
+    
+    @Override
+    public boolean isFollowing(int followerId, int followeeId) throws Exception {
+        return followDao.isFollowing(followerId, followeeId);
+    }
 }

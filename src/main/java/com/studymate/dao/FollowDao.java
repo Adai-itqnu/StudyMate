@@ -8,4 +8,5 @@ public interface FollowDao {
     boolean delete(int followerId, int followeeId) throws Exception;
     List<User> findFollowers(int userId) throws Exception;
     List<User> findFollowees(int userId) throws Exception;
+    boolean isFollowing(int followerId, int followeeId) throws Exception;
 }
