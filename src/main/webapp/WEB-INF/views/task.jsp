@@ -563,7 +563,7 @@
                     <h5 class="mb-3"><i class="fas fa-tools"></i> Tính năng</h5>
                     
                     <!-- 1. Tạo lịch học -->
-                    <div class="feature-card" onclick="window.location.href='<c:url value="/schedules"/>'">
+                    <div class="feature-card" onclick="window.location.href='<c:url value="/schedule"/>'">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-calendar-alt text-primary fa-2x me-3"></i>
                             <div>
@@ -607,7 +607,7 @@
                     </div>
                     
                     <!-- 5. Nhóm học tập -->
-                    <div class="feature-card" onclick="window.location.href='#'">
+                    <div class="feature-card" onclick="window.location.href='<c:url value="/rooms"/>'">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-users text-primary fa-2x me-3"></i>
                             <div>
@@ -617,16 +617,7 @@
                         </div>
                     </div>
                     
-                    <!-- 6. Thống kê quá trình học tập -->
-                    <div class="feature-card" onclick="window.location.href='#'">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-chart-line text-danger fa-2x me-3"></i>
-                            <div>
-                                <h6 class="mb-1">Thống kê quá trình học tập</h6>
-                                <small class="text-muted">Theo dõi tiến độ</small>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         </div>

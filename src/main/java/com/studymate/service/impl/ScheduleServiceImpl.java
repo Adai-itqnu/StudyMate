@@ -9,113 +9,73 @@ import java.sql.Time;
 import java.util.*;
 
 public class ScheduleServiceImpl implements ScheduleService {
-    private ScheduleDao scheduleDAO;
-    
+    private final ScheduleDao scheduleDao;
+
     public ScheduleServiceImpl() {
-        this.scheduleDAO = new ScheduleDaoImpl();
+        this.scheduleDao = new ScheduleDaoImpl();
     }
-    
-    @Override
-    public List<Schedule> getAllSchedules() {
-        return scheduleDAO.getAllSchedules();
-    }
-    
+
     @Override
     public List<Schedule> getSchedulesByUserId(int userId) {
-        return scheduleDAO.getSchedulesByUserId(userId);
+        return scheduleDao.getSchedulesByUserId(userId);
     }
-    
+
     @Override
     public Schedule getScheduleById(int scheduleId) {
-        return scheduleDAO.getScheduleById(scheduleId);
+        return scheduleDao.getScheduleById(scheduleId);
     }
-    
+
     @Override
     public boolean createSchedule(Schedule schedule) {
-        if (!validateSchedule(schedule)) {
-            return false;
-        }
-        return scheduleDAO.addSchedule(schedule);
+        return validateSchedule(schedule) && scheduleDao.addSchedule(schedule);
     }
-    
+
     @Override
     public boolean updateSchedule(Schedule schedule) {
-        if (!validateSchedule(schedule)) {
-            return false;
-        }
-        return scheduleDAO.updateSchedule(schedule);
+        return validateSchedule(schedule) && scheduleDao.updateSchedule(schedule);
     }
-    
+
     @Override
     public boolean deleteSchedule(int scheduleId) {
-        return scheduleDAO.deleteSchedule(scheduleId);
+        return scheduleDao.deleteSchedule(scheduleId);
     }
-    
+
     @Override
     public Map<String, List<Schedule>> getWeeklyScheduleGrid(int userId) {
-        List<Schedule> allSchedules = scheduleDAO.getSchedulesByUserId(userId);
+        List<Schedule> schedules = scheduleDao.getSchedulesByUserId(userId);
         Map<String, List<Schedule>> weeklyGrid = new LinkedHashMap<>();
-        
-        String[] days = {"Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"};
-        
+        String[] days = {"Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"};
+
         for (int i = 0; i < days.length; i++) {
             List<Schedule> daySchedules = new ArrayList<>();
-            for (Schedule schedule : allSchedules) {
-                if (schedule.getDayOfWeek() == (i + 2)) { // Thứ 2 = 2, Thứ 3 = 3, etc.
+            for (Schedule schedule : schedules) {
+                if (schedule.getDayOfWeek() == (i + 1)) {
                     daySchedules.add(schedule);
                 }
             }
-            // Sắp xếp theo thời gian bắt đầu
-            daySchedules.sort((s1, s2) -> s1.getStartTime().compareTo(s2.getStartTime()));
+            daySchedules.sort(Comparator.comparing(Schedule::getStartTime));
             weeklyGrid.put(days[i], daySchedules);
         }
-        
         return weeklyGrid;
     }
-    
+
     @Override
     public boolean validateSchedule(Schedule schedule) {
-        // Kiểm tra dữ liệu cơ bản
-        if (schedule.getUserId() <= 0 || schedule.getSubjectId() <= 0 || 
-            schedule.getRoomId() <= 0 || schedule.getDayOfWeek() < 2 || 
-            schedule.getDayOfWeek() > 7) {
+        if (schedule.getUserId() <= 0 ||
+            schedule.getSubject() == null || schedule.getSubject().trim().isEmpty() ||
+            schedule.getRoom() == null || schedule.getRoom().trim().isEmpty() ||
+            schedule.getDayOfWeek() < 1 || schedule.getDayOfWeek() > 7 ||
+            schedule.getStartTime() == null || schedule.getEndTime() == null) {
             return false;
         }
-        
-        // Kiểm tra thời gian
-        if (schedule.getStartTime() == null || schedule.getEndTime() == null) {
+        if (schedule.getSubject().length() > 250 || schedule.getRoom().length() > 250) {
             return false;
         }
-        
         if (schedule.getStartTime().compareTo(schedule.getEndTime()) >= 0) {
             return false;
         }
-        
-        // Kiểm tra thời gian trong khung giờ học hợp lý (7:00 - 22:00)
         Time minTime = Time.valueOf("07:00:00");
         Time maxTime = Time.valueOf("22:00:00");
-        
-        if (schedule.getStartTime().before(minTime) || 
-            schedule.getEndTime().after(maxTime)) {
-            return false;
-        }
-        
-        return true;
-    }
-    
-    @Override
-    public List<Schedule> getSchedulesByDay(int userId, int dayOfWeek) {
-        List<Schedule> allSchedules = scheduleDAO.getSchedulesByUserId(userId);
-        List<Schedule> daySchedules = new ArrayList<>();
-        
-        for (Schedule schedule : allSchedules) {
-            if (schedule.getDayOfWeek() == dayOfWeek) {
-                daySchedules.add(schedule);
-            }
-        }
-        
-        // Sắp xếp theo thời gian
-        daySchedules.sort((s1, s2) -> s1.getStartTime().compareTo(s2.getStartTime()));
-        return daySchedules;
+        return !schedule.getStartTime().before(minTime) && !schedule.getEndTime().after(maxTime);
     }
 }

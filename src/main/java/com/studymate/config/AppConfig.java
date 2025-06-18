@@ -14,13 +14,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebMvc
 @ComponentScan("com.studymate")
 public class AppConfig implements WebMvcConfigurer {
+    
+    public AppConfig() {
+        System.out.println("=== AppConfig constructor called ===");
+    }
+    
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
+        System.out.println("✓ Configuring JSP view resolver: /WEB-INF/views/ + .jsp");
         registry.jsp("/WEB-INF/views/", ".jsp");
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        System.out.println("✓ Configuring resource handlers");
         registry.addResourceHandler("/resources/**")
         .addResourceLocations("/resources/");
         registry.addResourceHandler("/css/**")
@@ -33,6 +40,7 @@ public class AppConfig implements WebMvcConfigurer {
 
     @Bean
     public MultipartResolver multipartResolver() {
+        System.out.println("✓ Creating MultipartResolver bean");
         return new StandardServletMultipartResolver();
     }
 }

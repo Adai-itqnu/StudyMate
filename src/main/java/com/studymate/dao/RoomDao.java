@@ -12,4 +12,8 @@ public interface RoomDao {
 
     // Lưu phòng mới
     void save(Room room) throws Exception;
+    
+    List<Room> getAllRooms() throws Exception;
+    
+    Room getRoomById(int id) throws Exception;
 } 

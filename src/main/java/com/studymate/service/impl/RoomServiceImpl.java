@@ -25,4 +25,14 @@ public class RoomServiceImpl implements RoomService {
     public void createRoom(Room room) throws Exception {
         roomDao.save(room);
     }
+    
+    @Override
+    public List<Room> getAllRooms()  throws Exception{
+        return roomDao.getAllRooms();
+    }
+
+    @Override
+    public Room getRoomById(int id) throws Exception {
+        return roomDao.getRoomById(id);
+    }
 } 

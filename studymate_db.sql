@@ -7,12 +7,6 @@ CREATE TABLE schools (
     name        VARCHAR(255) NOT NULL UNIQUE
 );
 
--- Bảng subjects (môn học)
-CREATE TABLE subjects (
-    subject_id  INT AUTO_INCREMENT PRIMARY KEY,
-    name        VARCHAR(100) NOT NULL UNIQUE
-);
-
 -- Bảng users
 CREATE TABLE users (
     user_id         INT AUTO_INCREMENT PRIMARY KEY,
@@ -89,7 +83,7 @@ CREATE TABLE tasks (
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
-select * from tasks
+
 -- Bảng likes
 CREATE TABLE likes (
     user_id     INT,
@@ -133,18 +127,15 @@ CREATE TABLE documents (
 CREATE TABLE schedules (
     schedule_id   INT AUTO_INCREMENT PRIMARY KEY,
     user_id       INT NOT NULL,
-    subject_id    INT NOT NULL,
-    room_id       INT NOT NULL,                   -- khoá ngoại tới rooms
+    subject varchar(250) not null,
+    room varchar(250) not null,
     day_of_week   TINYINT NOT NULL,               -- 1=Thứ hai … 7=Chủ nhật
     start_time    TIME NOT NULL,                  -- giờ bắt đầu
     end_time      TIME NOT NULL,                  -- giờ kết thúc
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id)    REFERENCES users(user_id),
-    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id),
-    FOREIGN KEY (room_id)    REFERENCES rooms(room_id)
+    FOREIGN KEY (user_id)    REFERENCES users(user_id)
 );
-
 
 INSERT INTO schools (name) VALUES 
 ('THPT Nguyễn Huệ'),

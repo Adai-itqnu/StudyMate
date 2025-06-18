@@ -380,7 +380,7 @@
                         <i class="fas fa-tools"></i> Tính năng
                     </h5>
                     
-                    <div class="feature-card" onclick="window.location.href='<c:url value='/calendar'/>'">
+                    <div class="feature-card" onclick="window.location.href='<c:url value='/schedule'/>'">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-calendar-alt text-primary fa-2x me-3"></i>
                             <div>

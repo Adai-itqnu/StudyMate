@@ -12,4 +12,8 @@ public interface RoomService {
 
     // Tạo phòng mới
     void createRoom(Room room) throws Exception;
-} 
+    
+    List<Room> getAllRooms() throws Exception;
+    
+    Room getRoomById(int id) throws Exception;
+} 	

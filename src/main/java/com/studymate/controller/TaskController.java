@@ -301,13 +301,6 @@ public class TaskController extends HttpServlet {
             throw new Exception("Bạn không có quyền thực hiện thao tác này");
         }
         
-        // Nếu đang ghim, kiểm tra số lượng task đã ghim
-//        if (pinned) {
-//            List<Task> pinnedTasks = taskService.getPinnedTasksByUser(userId);
-//            if (pinnedTasks.size() >= 3) {
-//                throw new Exception("Bạn chỉ có thể ghim tối đa 3 task!");
-//            }
-//        }
         
         taskService.pinTask(taskId, pinned, userId);
         System.out.println("Task pin status updated successfully");
