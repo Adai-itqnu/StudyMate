@@ -85,13 +85,11 @@ CREATE TABLE tasks (
     due_date    DATE,
     status      ENUM('PENDING','DONE') DEFAULT 'PENDING',
     is_pinned   BOOLEAN DEFAULT FALSE,
-    parent_id   INT NULL, -- Để tạo subtask
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (parent_id) REFERENCES tasks(task_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
-
+select * from tasks
 -- Bảng likes
 CREATE TABLE likes (
     user_id     INT,

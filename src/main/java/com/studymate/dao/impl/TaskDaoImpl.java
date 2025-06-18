@@ -2,263 +2,188 @@ package com.studymate.dao.impl;
 
 import com.studymate.dao.TaskDao;
 import com.studymate.model.Task;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
-@Repository
 public class TaskDaoImpl implements TaskDao {
-    
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    
-    // RowMapper for Task
-    private final RowMapper<Task> taskRowMapper = new RowMapper<Task>() {
-        @Override
-        public Task mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Task task = new Task();
-            task.setTaskId(rs.getInt("task_id"));
-            task.setUserId(rs.getInt("user_id"));
-            task.setTitle(rs.getString("title"));
-            task.setDescription(rs.getString("description"));
-            task.setDueDate(rs.getTimestamp("due_date"));
-            task.setStatus(rs.getString("status"));
-            task.setPinned(rs.getBoolean("is_pinned"));
-            
-            // Handle nullable parent_id
-            int parentId = rs.getInt("parent_id");
-            if (rs.wasNull()) {
-                task.setParentId(null);
-            } else {
-                task.setParentId(parentId);
-            }
-            
-            task.setCreatedAt(rs.getTimestamp("created_at"));
-            task.setUpdatedAt(rs.getTimestamp("updated_at"));
-            
-            // Set completion stats if available
-            try {
-                task.setTotalSubtasks(rs.getInt("total_subtasks"));
-                task.setCompletedSubtasks(rs.getInt("completed_subtasks"));
-            } catch (SQLException e) {
-                // Columns may not exist in all queries
-                task.setTotalSubtasks(0);
-                task.setCompletedSubtasks(0);
-            }
-            
-            return task;
-        }
-    };
-    
-    @Override
-    public void createTask(Task task) {
-        String sql = "INSERT INTO tasks (user_id, title, description, due_date, status, is_pinned, parent_id, created_at, updated_at) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, task.getUserId());
-            ps.setString(2, task.getTitle());
-            ps.setString(3, task.getDescription());
-            
-            if (task.getDueDate() != null) {
-                ps.setTimestamp(4, new java.sql.Timestamp(task.getDueDate().getTime()));
-            } else {
-                ps.setNull(4, java.sql.Types.TIMESTAMP);
-            }
-            
-            ps.setString(5, task.getStatus());
-            ps.setBoolean(6, task.isPinned());
-            
-            if (task.getParentId() != null) {
-                ps.setInt(7, task.getParentId());
-            } else {
-                ps.setNull(7, java.sql.Types.INTEGER);
-            }
-            
-            ps.setTimestamp(8, new java.sql.Timestamp(task.getCreatedAt().getTime()));
-            ps.setTimestamp(9, new java.sql.Timestamp(task.getUpdatedAt().getTime()));
-            
-            return ps;
-        }, keyHolder);
-        
-        // Set the generated task ID
-        if (keyHolder.getKey() != null) {
-            task.setTaskId(keyHolder.getKey().intValue());
-        }
+    private Connection connection;
+
+    public TaskDaoImpl(Connection connection) {
+        this.connection = connection;
     }
-    
+
+    @Override
+    public List<Task> getTasksByUser(int userId, boolean completed) {
+        List<Task> tasks = new ArrayList<>();
+        String sql = "SELECT * FROM tasks WHERE user_id = ? AND status = ? ORDER BY is_pinned DESC, due_date ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setString(2, completed ? "DONE" : "PENDING");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Task task = mapRowToTask(rs);
+                tasks.add(task);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting tasks by user: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return tasks;
+    }
+
     @Override
     public Task getTaskById(int taskId) {
         String sql = "SELECT * FROM tasks WHERE task_id = ?";
-        
-        try {
-            Task task = jdbcTemplate.queryForObject(sql, taskRowMapper, taskId);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, taskId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapRowToTask(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting task by ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public void addTask(Task task) {
+        String sql = "INSERT INTO tasks (user_id, title, description, due_date, status, is_pinned, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, task.getUserId());
+            ps.setString(2, task.getTitle());
+            ps.setString(3, task.getDescription() != null ? task.getDescription() : "");
             
-            // Load subtasks if this is a main task
-            if (task != null && task.isMainTask()) {
-                List<Task> subtasks = getSubtasksByParentId(taskId);
-                task.setSubtasks(subtasks);
-                
-                // Update completion stats
-                task.setTotalSubtasks(getTotalSubtasksCount(taskId));
-                task.setCompletedSubtasks(getCompletedSubtasksCount(taskId));
+            if (task.getDueDate() != null) {
+                ps.setDate(4, new java.sql.Date(task.getDueDate().getTime()));
+            } else {
+                ps.setNull(4, Types.DATE);
             }
             
-            return task;
-        } catch (Exception e) {
-            return null;
+            ps.setString(5, task.getStatus() != null ? task.getStatus() : "PENDING");
+            ps.setBoolean(6, task.isPinned());
+            
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("Rows affected: " + rowsAffected);
+            
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                task.setTaskId(rs.getInt(1));
+                System.out.println("Generated task ID: " + task.getTaskId());
+            }
+        } catch (SQLException e) {
+            System.err.println("Error adding task: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to add task", e);
         }
     }
-    
+
     @Override
     public void updateTask(Task task) {
-        String sql = "UPDATE tasks SET title = ?, description = ?, due_date = ?, status = ?, is_pinned = ?, updated_at = ? " +
-                    "WHERE task_id = ?";
-        
-        jdbcTemplate.update(sql,
-            task.getTitle(),
-            task.getDescription(),
-            task.getDueDate() != null ? new java.sql.Timestamp(task.getDueDate().getTime()) : null,
-            task.getStatus(),
-            task.isPinned(),
-            new java.sql.Timestamp(task.getUpdatedAt().getTime()),
-            task.getTaskId()
-        );
+        String sql = "UPDATE tasks SET title=?, description=?, due_date=?, status=?, is_pinned=?, updated_at=CURRENT_TIMESTAMP WHERE task_id=?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, task.getTitle());
+            ps.setString(2, task.getDescription() != null ? task.getDescription() : "");
+            
+            if (task.getDueDate() != null) {
+                ps.setDate(3, new java.sql.Date(task.getDueDate().getTime()));
+            } else {
+                ps.setNull(3, Types.DATE);
+            }
+            
+            ps.setString(4, task.getStatus());
+            ps.setBoolean(5, task.isPinned());
+            ps.setInt(6, task.getTaskId());
+            
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("Update task - Rows affected: " + rowsAffected);
+            
+        } catch (SQLException e) {
+            System.err.println("Error updating task: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to update task", e);
+        }
     }
-    
+
     @Override
     public void deleteTask(int taskId) {
-        // First delete all subtasks
-        deleteSubtasksByParentId(taskId);
-        
-        // Then delete the main task
-        String sql = "DELETE FROM tasks WHERE task_id = ?";
-        jdbcTemplate.update(sql, taskId);
+        String sql = "DELETE FROM tasks WHERE task_id=?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, taskId);
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("Delete task - Rows affected: " + rowsAffected);
+        } catch (SQLException e) {
+            System.err.println("Error deleting task: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to delete task", e);
+        }
     }
-    
+
     @Override
-    public List<Task> getAllTasksByUserId(int userId) {
-        String sql = "SELECT t.*, " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id) as total_subtasks, " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id AND st.status = 'DONE') as completed_subtasks " +
-                    "FROM tasks t WHERE t.user_id = ? AND t.parent_id IS NULL " +
-                    "ORDER BY t.is_pinned DESC, t.created_at DESC";
-        
-        List<Task> tasks = jdbcTemplate.query(sql, taskRowMapper, userId);
-        
-        // Load subtasks for each main task
-        for (Task task : tasks) {
-            List<Task> subtasks = getSubtasksByParentId(task.getTaskId());
-            task.setSubtasks(subtasks);
+    public void pinTask(int taskId, boolean pinned, int userId) throws Exception {
+        // Kiểm tra giới hạn ghim chỉ khi đang ghim task
+        if (pinned && countPinnedTasks(userId) >= 3) {
+            throw new Exception("Chỉ được ghim tối đa 3 task!");
         }
         
-        return tasks;
+        String sql = "UPDATE tasks SET is_pinned=?, updated_at=CURRENT_TIMESTAMP WHERE task_id=? AND user_id=?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setBoolean(1, pinned);
+            ps.setInt(2, taskId);
+            ps.setInt(3, userId);
+            
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("Pin task - Rows affected: " + rowsAffected);
+            
+            if (rowsAffected == 0) {
+                throw new Exception("Task không tồn tại hoặc bạn không có quyền thay đổi task này!");
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error pinning task: " + e.getMessage());
+            e.printStackTrace();
+            throw new Exception("Lỗi khi ghim/bỏ ghim task: " + e.getMessage());
+        }
     }
-    
+
     @Override
-    public List<Task> getCompletedTasksByUserId(int userId) {
-        String sql = "SELECT t.*, " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id) as total_subtasks, " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id AND st.status = 'DONE') as completed_subtasks " +
-                    "FROM tasks t WHERE t.user_id = ? AND t.parent_id IS NULL " +
-                    "AND (t.status = 'DONE' OR " +
-                    "((SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id) > 0 AND " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id AND st.status = 'DONE') = " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id))) " +
-                    "ORDER BY t.updated_at DESC";
+    public int countPinnedTasks(int userId) {
+        String sql = "SELECT COUNT(*) FROM tasks WHERE user_id=? AND is_pinned=TRUE AND status='PENDING'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                System.out.println("Pinned tasks count for user " + userId + ": " + count);
+                return count;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error counting pinned tasks: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    private Task mapRowToTask(ResultSet rs) throws SQLException {
+        Task task = new Task();
+        task.setTaskId(rs.getInt("task_id"));
+        task.setUserId(rs.getInt("user_id"));
+        task.setTitle(rs.getString("title"));
+        task.setDescription(rs.getString("description"));
         
-        List<Task> tasks = jdbcTemplate.query(sql, taskRowMapper, userId);
-        
-        for (Task task : tasks) {
-            List<Task> subtasks = getSubtasksByParentId(task.getTaskId());
-            task.setSubtasks(subtasks);
+        java.sql.Date dueDate = rs.getDate("due_date");
+        if (dueDate != null) {
+            task.setDueDate(new java.util.Date(dueDate.getTime()));
         }
         
-        return tasks;
-    }
-    
-    @Override
-    public List<Task> getIncompleteTasksByUserId(int userId) {
-        String sql = "SELECT t.*, " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id) as total_subtasks, " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id AND st.status = 'DONE') as completed_subtasks " +
-                    "FROM tasks t WHERE t.user_id = ? AND t.parent_id IS NULL " +
-                    "AND NOT (t.status = 'DONE' OR " +
-                    "((SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id) > 0 AND " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id AND st.status = 'DONE') = " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id))) " +
-                    "ORDER BY t.due_date ASC NULLS LAST, t.created_at DESC";
+        task.setStatus(rs.getString("status"));
+        task.setPinned(rs.getBoolean("is_pinned"));
+        task.setCreatedAt(rs.getTimestamp("created_at"));
+        task.setUpdatedAt(rs.getTimestamp("updated_at"));
         
-        List<Task> tasks = jdbcTemplate.query(sql, taskRowMapper, userId);
-        
-        for (Task task : tasks) {
-            List<Task> subtasks = getSubtasksByParentId(task.getTaskId());
-            task.setSubtasks(subtasks);
-        }
-        
-        return tasks;
-    }
-    
-    @Override
-    public List<Task> getPinnedTasksByUserId(int userId) {
-        String sql = "SELECT t.*, " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id) as total_subtasks, " +
-                    "(SELECT COUNT(*) FROM tasks st WHERE st.parent_id = t.task_id AND st.status = 'DONE') as completed_subtasks " +
-                    "FROM tasks t WHERE t.user_id = ? AND t.parent_id IS NULL AND t.is_pinned = true " +
-                    "ORDER BY t.created_at DESC";
-        
-        List<Task> tasks = jdbcTemplate.query(sql, taskRowMapper, userId);
-        
-        for (Task task : tasks) {
-            List<Task> subtasks = getSubtasksByParentId(task.getTaskId());
-            task.setSubtasks(subtasks);
-        }
-        
-        return tasks;
-    }
-    
-    @Override
-    public List<Task> getSubtasksByParentId(int parentId) {
-        String sql = "SELECT * FROM tasks WHERE parent_id = ? ORDER BY created_at ASC";
-        return jdbcTemplate.query(sql, taskRowMapper, parentId);
-    }
-    
-    @Override
-    public void deleteSubtasksByParentId(int parentId) {
-        String sql = "DELETE FROM tasks WHERE parent_id = ?";
-        jdbcTemplate.update(sql, parentId);
-    }
-    
-    @Override
-    public int getCompletedSubtasksCount(int parentId) {
-        String sql = "SELECT COUNT(*) FROM tasks WHERE parent_id = ? AND status = 'DONE'";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, parentId);
-        return count != null ? count : 0;
-    }
-    
-    @Override
-    public int getTotalSubtasksCount(int parentId) {
-        String sql = "SELECT COUNT(*) FROM tasks WHERE parent_id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, parentId);
-        return count != null ? count : 0;
-    }
-    
-    @Override
-    public int getPinnedTasksCount(int userId) {
-        String sql = "SELECT COUNT(*) FROM tasks WHERE user_id = ? AND parent_id IS NULL AND is_pinned = true";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
-        return count != null ? count : 0;
+        return task;
     }
 }
