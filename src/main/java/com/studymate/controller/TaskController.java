@@ -27,7 +27,7 @@ public class TaskController extends HttpServlet {
     @Override
     public void init() throws ServletException {
         try {
-            // Sử dụng DBConnectionUtil để lấy connection
+        
             Connection connection = DBConnectionUtil.getConnection();
             
             // Khởi tạo DAO và Service

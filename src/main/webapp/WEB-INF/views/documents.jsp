@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -92,21 +93,26 @@
                         </h4>
                     </a>
                 </div>
+                
                 <div class="col-md-6">
                     <form action="<c:url value='/dashboard'/>" method="get" class="d-flex justify-content-center">
                         <div class="input-group search-box">
-                            <input type="text" name="search" class="form-control" placeholder="Tìm kiếm người dùng...">
+                            <input type="text" name="search" class="form-control" 
+                                   placeholder="Tìm kiếm người dùng..." 
+                                   value="${searchKeyword}">
                             <button class="btn btn-outline-primary" type="submit">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </form>
                 </div>
+                
                 <div class="col-md-3">
                     <div class="d-flex justify-content-end">
                         <div class="user-dropdown">
                             <div class="d-flex align-items-center cursor-pointer" onclick="toggleDropdown()">
-                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : '/assets/images/default-avatar.png'}" alt="Avatar" class="avatar me-2">
+                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : 'resources/assets/images/avatar.png'}" 
+                                     alt="Avatar" class="avatar me-2">
                                 <span class="me-2">${currentUser.fullName}</span>
                                 <i class="fas fa-chevron-down"></i>
                             </div>
@@ -173,19 +179,27 @@
                         </c:if>
                         <div class="row">
                             <c:forEach var="doc" items="${documents}">
-                                <div class="col-12 mb-3">
-                                    <div class="card doc-card p-3">
-                                        <div class="doc-title mb-1"><i class="fas fa-file-alt text-purple me-2"></i>${doc.title}</div>
-                                        <div class="doc-meta mb-2">${doc.description}</div>
-                                        <div class="mb-2">
-                                            <a class="doc-link" href="${doc.fileUrl}" target="_blank"><i class="fas fa-download me-1"></i>Tải/Xem tài liệu</a>
-                                        </div>
-                                        <div class="doc-meta">
-                                            <i class="fas fa-calendar-alt me-1"></i> ${doc.uploadedAt}
-                                        </div>
-                                    </div>
-                                </div>
-                            </c:forEach>
+    <div class="col-12 mb-3">
+        <div class="card doc-card p-3">
+            <div class="doc-title mb-1"><i class="fas fa-file-alt text-purple me-2"></i>${doc.title}</div>
+            <div class="doc-meta mb-2">${doc.description}</div>   
+            <!-- Hiển thị tên file gốc -->
+            <div class="mb-2">
+                <div class="doc-meta mb-1">
+                    <i class="fas fa-file me-1"></i>
+                    <!-- Lấy tên file gốc từ fileUrl -->
+                    ${fn:substringAfter(doc.fileUrl, '_')}
+                </div>
+                <a class="doc-link" href="${pageContext.request.contextPath}/documents/download?path=${doc.fileUrl}" target="_blank">
+                    <i class="fas fa-download me-1"></i>Tải/Xem tài liệu
+                </a>
+            </div>
+            <div class="doc-meta">
+                <i class="fas fa-calendar-alt me-1"></i> ${doc.uploadedAt}
+            </div>
+        </div>
+    </div>
+</c:forEach>
                             <c:if test="${empty documents}">
                                 <div class="col-12 text-center text-muted py-5">
                                     <i class="fas fa-folder-open fa-2x mb-2"></i><br/>

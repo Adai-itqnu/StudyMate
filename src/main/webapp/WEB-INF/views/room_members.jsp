@@ -1,27 +1,15 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyMate - Danh sách nhóm</title>
+    <title>StudyMate - Thành viên nhóm ${room.name}</title>
     <link href="<c:url value='/assets/css/bootstrap.min.css'/>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/assets/css/dashboard.css"/>
     <style>
-        .room-card {
-            box-shadow: 0 4px 20px rgba(142,36,170,0.10);
-            border-radius: 18px;
-            border: 1.5px solid #e1bee7;
-            background: white;
-            transition: box-shadow 0.2s, transform 0.2s;
-        }
-        .room-card:hover {
-            box-shadow: 0 8px 32px rgba(142,36,170,0.18);
-            transform: translateY(-3px);
-        }
         .btn-purple {
             background: linear-gradient(135deg, #8e24aa, #ba68c8);
             color: #fff;
@@ -47,9 +35,7 @@
                         </h4>
                     </a>
                 </div>
-                <div class="col-md-6 text-center">
-                    <!-- Ô tìm kiếm đã bị loại bỏ -->
-                </div>
+                <div class="col-md-6"></div>
                 <div class="col-md-3">
                     <div class="d-flex justify-content-end">
                         <div class="user-dropdown">
@@ -80,12 +66,10 @@
     <!-- Main Content -->
     <div class="container-fluid">
         <div class="row">
-            <!-- Left Sidebar - Gợi ý người dùng -->
+            <!-- Left Sidebar -->
             <div class="col-md-3">
                 <div class="sidebar">
-                    <h5 class="mb-3">
-                        <i class="fas fa-users"></i> Gợi ý theo dõi
-                    </h5>
+                    <h5 class="mb-3"><i class="fas fa-users"></i> Gợi ý theo dõi</h5>
                     <c:forEach var="suggestion" items="${suggestions}">
                         <div class="suggestion-card">
                             <div class="d-flex align-items-center">
@@ -97,12 +81,10 @@
                                 </div>
                             </div>
                             <div class="mt-2">
-                                <button class="btn btn-primary btn-sm me-2" 
-                                        onclick="followUser(${suggestion.userId})">
+                                <button class="btn btn-primary btn-sm me-2" onclick="followUser(${suggestion.userId})">
                                     <i class="fas fa-plus"></i> Theo dõi
                                 </button>
-                                <a href="<c:url value='/profile/${suggestion.userId}'/>" 
-                                   class="btn btn-outline-secondary btn-sm">
+                                <a href="<c:url value='/profile/${suggestion.userId}'/>" class="btn btn-outline-secondary btn-sm">
                                     Xem trang
                                 </a>
                             </div>
@@ -111,86 +93,57 @@
                 </div>
             </div>
 
-            <!-- Main Content Area: Danh sách nhóm -->
+            <!-- Main Content Area -->
             <div class="col-md-6">
                 <div class="main-content">
-                    <div class="post-form">
-                        <h5 class="mb-3">
-                            <i class="fas fa-users"></i> Danh sách nhóm học tập
-                        </h5>
-                        <div class="mb-4">
-                            <a href="<c:url value='/rooms/create'/>" class="btn btn-purple">
-                                <i class="fas fa-plus-circle me-2"></i> Tạo nhóm mới
-                            </a>
+                    <h5 class="mb-4"><i class="fas fa-users"></i> Thành viên nhóm: ${room.name}</h5>
+                    <c:if test="${not empty error}">
+                        <div class="alert alert-danger">${error}</div>
+                    </c:if>
+                    <!-- Form thêm thành viên -->
+                    <form action="<c:url value='/rooms/${room.roomId}/members/add'/>" method="post" class="mb-4">
+                        <div class="input-group">
+                            <input type="number" name="userId" class="form-control" placeholder="Nhập ID người dùng" required>
+                            <button type="submit" class="btn btn-purple">Thêm thành viên</button>
                         </div>
-                        <c:if test="${not empty error}">
-                            <div class="alert alert-danger">${error}</div>
-                        </c:if>
-                        <c:if test="${not empty message}">
-                            <div class="alert alert-success">${message}</div>
-                        </c:if>
-                        <c:if test="${not empty rooms}">
-                            <div class="row">
-                                <c:forEach var="room" items="${rooms}">
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card room-card p-3">
-                                            <h6 class="mb-1">${room.name}</h6>
-                                            <small class="text-muted mb-2"><i class="fas fa-map-marker-alt"></i> ${room.location}</small>
-                                            <div class="mt-3 d-flex gap-2">
-                                                <c:choose>
-                                                    <c:when test="${room.userId == currentUser.userId}">
-                                                        <!-- Người tạo nhóm chỉ thấy nút Xem thành viên -->
-                                                        <a href="<c:url value='/rooms/${room.roomId}/members'/>" class="btn btn-primary btn-sm">
-                                                            <i class="fas fa-users"></i> Xem thành viên
-                                                        </a>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <!-- Người dùng khác thấy nút Tham gia nhóm và Xem thành viên -->
-                                                        <c:if test="${room.userId != currentUser.userId && empty room.members}">
-    <form action="<c:url value='/rooms/${room.roomId}/members/add'/>" method="post" style="display:inline;">
-        <input type="hidden" name="userId" value="${currentUser.userId}">
-        <button type="submit" class="btn btn-purple btn-sm">
-            <i class="fas fa-plus-circle"></i> Tham gia nhóm
-        </button>
-    </form>
-</c:if>
-                                                        <a href="<c:url value='/rooms/${room.roomId}/members'/>" class="btn btn-outline-primary btn-sm">
-                                                            <i class="fas fa-users"></i> Xem thành viên
-                                                        </a>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <c:if test="${room.userId == currentUser.userId}">
-                                                    <a href="<c:url value='/rooms/${room.roomId}/edit'/>" class="btn btn-outline-warning btn-sm">
-                                                        <i class="fas fa-edit"></i> Sửa
-                                                    </a>
-                                                    <form action="<c:url value='/rooms/${room.roomId}/delete'/>" method="post" style="display:inline;">
-                                                        <button type="submit" class="btn btn-outline-danger btn-sm" 
-                                                                onclick="return confirm('Bạn có chắc muốn xóa nhóm ${room.name}?')">
-                                                            <i class="fas fa-trash"></i> Xóa
-                                                        </button>
-                                                    </form>
-                                                </c:if>
+                    </form>
+                    <!-- Danh sách thành viên -->
+                    <c:if test="${not empty members}">
+                        <div class="card p-3">
+                            <ul class="list-group list-group-flush">
+                                <c:forEach var="member" items="${members}">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <img src="${member.avatarUrl != null ? member.avatarUrl : '/assets/images/default-avatar.png'}" 
+                                                 alt="Avatar" class="avatar me-3">
+                                            <div>
+                                                <h6 class="mb-1">${member.fullName}</h6>
+                                                <small class="text-muted">@${member.username}</small>
                                             </div>
                                         </div>
-                                    </div>
+                                        <c:if test="${room.userId == currentUser.userId && member.userId != currentUser.userId}">
+                                            <form action="<c:url value='/rooms/${room.roomId}/members/${member.userId}/remove'/>" method="post" style="display:inline;">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                                        onclick="return confirm('Bạn có chắc muốn xóa ${member.fullName} khỏi nhóm?')">
+                                                    <i class="fas fa-trash"></i> Xóa
+                                                </button>
+                                            </form>
+                                        </c:if>
+                                    </li>
                                 </c:forEach>
-                            </div>
-                        </c:if>
-                        <c:if test="${empty rooms}">
-                            <div class="alert alert-info mt-4" style="border-radius:12px;">
-                                <i class="fas fa-info-circle me-2"></i> Hiện chưa có nhóm nào.
-                            </div>
-                        </c:if>
-                    </div>
+                            </ul>
+                        </div>
+                    </c:if>
+                    <c:if test="${empty members}">
+                        <div class="alert alert-info">Chưa có thành viên nào trong nhóm.</div>
+                    </c:if>
                 </div>
             </div>
 
-            <!-- Right Sidebar - Features -->
+            <!-- Right Sidebar -->
             <div class="col-md-3">
                 <div class="right-sidebar">
-                    <h5 class="mb-3">
-                        <i class="fas fa-tools"></i> Tính năng
-                    </h5>
+                    <h5 class="mb-3"><i class="fas fa-tools"></i> Tính năng</h5>
                     <div class="feature-card" onclick="window.location.href='<c:url value='/schedules'/>'">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-calendar-alt text-primary fa-2x me-3"></i>

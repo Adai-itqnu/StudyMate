@@ -1,19 +1,16 @@
 package com.studymate.dao;
 
 import com.studymate.model.Room;
+import com.studymate.model.User;
 import java.util.List;
 
 public interface RoomDao {
-    // Lấy tất cả các phòng
     List<Room> findAll() throws Exception;
-
-    // Lấy phòng theo ID
     Room findById(int roomId) throws Exception;
-
-    // Lưu phòng mới
     void save(Room room) throws Exception;
-    
-    List<Room> getAllRooms() throws Exception;
-    
-    Room getRoomById(int id) throws Exception;
-} 
+    void update(Room room) throws Exception;
+    void delete(int roomId) throws Exception;
+    List<User> findMembersByRoomId(int roomId) throws Exception;
+    void addMember(int roomId, int userId) throws Exception;
+    void removeMember(int roomId, int userId) throws Exception;
+}

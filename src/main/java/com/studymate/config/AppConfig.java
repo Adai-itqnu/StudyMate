@@ -36,6 +36,8 @@ public class AppConfig implements WebMvcConfigurer {
         .addResourceLocations("/resources/js/");
         registry.addResourceHandler("/assets/**")
         .addResourceLocations("/resources/assets/");
+        registry.addResourceHandler("/resources/uploads/**")
+        .addResourceLocations("/resources/uploads/");
     }
 
     @Bean

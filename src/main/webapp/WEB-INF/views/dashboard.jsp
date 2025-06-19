@@ -430,15 +430,6 @@
                         </div>
                     </div>
                     
-                    <div class="feature-card" onclick="window.location.href='<c:url value='/statistics'/>'">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-chart-line text-danger fa-2x me-3"></i>
-                            <div>
-                                <h6 class="mb-1">Thống kê học tập</h6>
-                                <small class="text-muted">Theo dõi tiến độ</small>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

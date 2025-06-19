@@ -9,11 +9,7 @@ import com.studymate.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,7 +17,7 @@ import java.util.List;
 @RequestMapping("/rooms")
 public class RoomController {
     private final RoomService roomService = new RoomServiceImpl();
-    private final UserService userService = new UserServiceImpl(); // For follow suggestions
+    private final UserService userService = new UserServiceImpl();
 
     @GetMapping
     public String listRooms(HttpSession session, Model model) throws Exception {
@@ -29,14 +25,16 @@ public class RoomController {
         if (current == null) {
             return "redirect:/login";
         }
-
         List<Room> rooms = roomService.findAllRooms();
+        // Thêm trạng thái thành viên cho mỗi phòng
+        for (Room room : rooms) {
+            List<User> members = roomService.findMembersByRoomId(room.getRoomId());
+            boolean isMember = members.stream().anyMatch(member -> member.getUserId() == current.getUserId());
+            room.setMembers(isMember ? List.of(current) : List.of());
+        }
         model.addAttribute("rooms", rooms);
-
-        // Add follow suggestions to the model for the sidebar
-        List<User> suggestions = userService.getFollowSuggestions(current.getUserId());
-        model.addAttribute("suggestions", suggestions);
-
+        model.addAttribute("suggestions", userService.getFollowSuggestions(current.getUserId()));
+        model.addAttribute("currentUser", current);
         return "rooms";
     }
 
@@ -49,7 +47,8 @@ public class RoomController {
         model.addAttribute("room", new Room());
         List<User> suggestions = userService.getFollowSuggestions(current.getUserId());
         model.addAttribute("suggestions", suggestions);
-        return "create_room"; // You'll need to create create_room.jsp
+        model.addAttribute("currentUser", current);
+        return "create_room";
     }
 
     @PostMapping("/create")
@@ -58,27 +57,117 @@ public class RoomController {
         if (current == null) {
             return "redirect:/login";
         }
+        room.setUserId(current.getUserId());
         roomService.createRoom(room);
-
-        List<User> suggestions = userService.getFollowSuggestions(current.getUserId());
-        model.addAttribute("suggestions", suggestions);
-
-        return "redirect:/rooms"; // Redirect to the rooms list after creation
+        roomService.addMember(room.getRoomId(), current.getUserId());
+        model.addAttribute("message", "Tạo nhóm thành công!");
+        return "redirect:/rooms";
     }
 
-    @GetMapping("/{roomId}/chat")
-    public String showRoomChat(@PathVariable("roomId") int roomId, HttpSession session, Model model) throws Exception {
+    @GetMapping("/{roomId}/edit")
+    public String showEditRoomForm(@PathVariable("roomId") int roomId, HttpSession session, Model model) throws Exception {
+        User current = (User) session.getAttribute("currentUser");
+        if (current == null) {
+            return "redirect:/login";
+        }
+        Room room = roomService.findRoomById(roomId);
+        if (room == null || room.getUserId() != current.getUserId()) {
+            model.addAttribute("error", "Bạn không có quyền chỉnh sửa nhóm này!");
+            return "redirect:/rooms";
+        }
+        model.addAttribute("room", room);
+        List<User> suggestions = userService.getFollowSuggestions(current.getUserId());
+        model.addAttribute("suggestions", suggestions);
+        model.addAttribute("currentUser", current);
+        return "edit_room";
+    }
+
+    @PostMapping("/{roomId}/edit")
+    public String updateRoom(@PathVariable("roomId") int roomId, @ModelAttribute("room") Room room, HttpSession session, Model model) throws Exception {
+        User current = (User) session.getAttribute("currentUser");
+        if (current == null) {
+            return "redirect:/login";
+        }
+        Room existingRoom = roomService.findRoomById(roomId);
+        if (existingRoom == null || existingRoom.getUserId() != current.getUserId()) {
+            model.addAttribute("error", "Bạn không có quyền chỉnh sửa nhóm này!");
+            return "redirect:/rooms";
+        }
+        room.setRoomId(roomId);
+        room.setUserId(current.getUserId());
+        roomService.updateRoom(room);
+        model.addAttribute("message", "Cập nhật nhóm thành công!");
+        return "redirect:/rooms";
+    }
+
+    @PostMapping("/{roomId}/delete")
+    public String deleteRoom(@PathVariable("roomId") int roomId, HttpSession session, Model model) throws Exception {
+        User current = (User) session.getAttribute("currentUser");
+        if (current == null) {
+            return "redirect:/login";
+        }
+        Room room = roomService.findRoomById(roomId);
+        if (room == null || room.getUserId() != current.getUserId()) {
+            model.addAttribute("error", "Bạn không có quyền xóa nhóm này!");
+            return "redirect:/rooms";
+        }
+        roomService.deleteRoom(roomId);
+        model.addAttribute("message", "Xóa nhóm thành công!");
+        return "redirect:/rooms";
+    }
+
+    @GetMapping("/{roomId}/members")
+    public String listMembers(@PathVariable("roomId") int roomId, HttpSession session, Model model) throws Exception {
         User current = (User) session.getAttribute("currentUser");
         if (current == null) {
             return "redirect:/login";
         }
         Room room = roomService.findRoomById(roomId);
         if (room == null) {
-            return "redirect:/rooms"; // Or show an error page
+            return "redirect:/rooms";
         }
+        List<User> members = roomService.findMembersByRoomId(roomId);
         model.addAttribute("room", room);
+        model.addAttribute("members", members);
         List<User> suggestions = userService.getFollowSuggestions(current.getUserId());
         model.addAttribute("suggestions", suggestions);
-        return "chat_room"; // You'll need to create chat_room.jsp
+        model.addAttribute("currentUser", current);
+        return "room_members";
     }
-} 
+
+    @PostMapping("/{roomId}/members/add")
+    public String addMember(@PathVariable("roomId") int roomId, @RequestParam("userId") int userId, HttpSession session, Model model) throws Exception {
+        User current = (User) session.getAttribute("currentUser");
+        if (current == null) {
+            return "redirect:/login";
+        }
+        Room room = roomService.findRoomById(roomId);
+        if (room == null) {
+            model.addAttribute("error", "Nhóm không tồn tại!");
+            return "redirect:/rooms";
+        }
+        try {
+            roomService.addMember(roomId, userId);
+            model.addAttribute("message", "Tham gia nhóm thành công!");
+        } catch (Exception e) {
+            model.addAttribute("error", "Lỗi khi tham gia nhóm: " + e.getMessage());
+        }
+        return "redirect:/rooms";
+    }
+
+    @PostMapping("/{roomId}/members/{userId}/remove")
+    public String removeMember(@PathVariable("roomId") int roomId, @PathVariable("userId") int userId, HttpSession session, Model model) throws Exception {
+        User current = (User) session.getAttribute("currentUser");
+        if (current == null) {
+            return "redirect:/login";
+        }
+        Room room = roomService.findRoomById(roomId);
+        if (room == null || room.getUserId() != current.getUserId()) {
+            model.addAttribute("error", "Bạn không có quyền xóa thành viên!");
+            return "redirect:/rooms/" + roomId + "/members";
+        }
+        roomService.removeMember(roomId, userId);
+        model.addAttribute("message", "Xóa thành viên thành công!");
+        return "redirect:/rooms/" + roomId + "/members";
+    }
+}

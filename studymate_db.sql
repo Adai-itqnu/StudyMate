@@ -109,8 +109,19 @@ CREATE TABLE comments (
 -- Bảng rooms (phòng học)
 CREATE TABLE rooms (
     room_id    INT AUTO_INCREMENT PRIMARY KEY,
+    user_id     INT,
     name       VARCHAR(100) NOT NULL UNIQUE,     -- ví dụ: "P101", "Lab A"
-    location   VARCHAR(255)                       -- tùy chọn: mô tả vị trí, tòa nhà...
+    location   VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE room_members (
+    room_id INT NOT NULL,
+    user_id INT NOT NULL,
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (room_id, user_id),
+    FOREIGN KEY (room_id) REFERENCES rooms(room_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE documents (
