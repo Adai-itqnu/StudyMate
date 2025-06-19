@@ -16,7 +16,6 @@
     <div class="header">
         <div class="container-fluid">
             <div class="row align-items-center py-3">
-                <!-- Logo/Trang chủ -->
                 <div class="col-md-3">
                     <a href="<c:url value='/dashboard'/>" class="text-decoration-none">
                         <h4 class="mb-0 text-primary">
@@ -25,7 +24,6 @@
                     </a>
                 </div>
                 
-                <!-- Ô tìm kiếm -->
                 <div class="col-md-6">
                     <form action="<c:url value='/dashboard'/>" method="get" class="d-flex justify-content-center">
                         <div class="input-group search-box">
@@ -39,12 +37,11 @@
                     </form>
                 </div>
                 
-                <!-- User info -->
                 <div class="col-md-3">
                     <div class="d-flex justify-content-end">
                         <div class="user-dropdown">
                             <div class="d-flex align-items-center cursor-pointer" onclick="toggleDropdown()">
-                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : '/assets/images/default-avatar.png'}" 
+                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : 'resources/assets/images/avatar.png'}" 
                                      alt="Avatar" class="avatar me-2">
                                 <span class="me-2">${currentUser.fullName}</span>
                                 <i class="fas fa-chevron-down"></i>

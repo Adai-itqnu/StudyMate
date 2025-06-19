@@ -4,82 +4,83 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyMate - Phòng Chat: ${room.name}</title>
-    <link href="<c:url value='/assets/css/bootstrap.min.css'/>" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/assets/css/dashboard.css"/>
-        <style>
-        .chat-box {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            height: 550px; /* Tăng chiều cao của khung chat để bù lại thanh nhập nhỏ gọn hơn */
-            overflow-y: auto;
-            padding: 15px;
-            margin-bottom: 15px;
-            background-color: #f9f9f9;
-            display: flex;
-            flex-direction: column;
-        }
-        .message-input {
-            display: flex;
-            align-items: center; /* Đảm bảo căn chỉnh dọc */
-            margin-top: 10px;
-        }
-        .message-input .input-group {
-            width: 100%; /* Đảm bảo input-group chiếm toàn bộ chiều rộng */
-        }
-        .message-input textarea.form-control {
-            border-radius: 20px 0 0 20px; /* Bo tròn bên trái */
-            padding: 8px 15px; /* Đệm nhất quán */
-            resize: none;
-            height: 38px; /* Chiều cao được giảm nhẹ để nhỏ gọn */
-            min-height: 38px;
-            max-height: 38px;
-            overflow-y: hidden;
-            font-size: 0.9em;
-            box-shadow: none; /* Loại bỏ mọi bóng tập trung mặc định */
-        }
-        .message-input .input-group-append .btn {
-            border-radius: 0 20px 20px 0; /* Bo tròn bên phải */
-            height: 38px; /* Đảm bảo cùng chiều cao với textarea để căn chỉnh hoàn hảo */
-            padding: 0 15px; /* Điều chỉnh padding */
-            font-size: 1.1em; /* Kích thước biểu tượng */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: none; /* Loại bỏ mọi bóng tập trung mặc định */
-        }
-        .message {
-            margin-bottom: 8px;
-            padding: 7px 10px;
-            border-radius: 10px;
-            max-width: 75%;
-            word-wrap: break-word;
-        }
-        .message.sent {
-            background-color: #DCF8C6;
-            align-self: flex-end;
-            margin-left: auto;
-        }
-        .message.received {
-            background-color: #E0E0E0;
-            align-self: flex-start;
-        }
-        .message-meta {
-            font-size: 0.7em;
-            color: #888;
-            margin-top: 3px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyMate - Phòng Chat: ${room.name}</title>
+
+  <!-- Bootstrap 5.3.0 -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <!-- FontAwesome 6.x -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    rel="stylesheet"
+  >
+  <!-- CSS riêng -->
+  <link
+    rel="stylesheet"
+    href="${pageContext.request.contextPath}/resources/assets/css/dashboard.css"
+  />
+
+  <style>
+    /* Khung chat */
+    .chat-box {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      height: 400px;
+      overflow-y: auto;
+    }
+    /* Tin nhắn */
+    .message {
+      margin-bottom: 10px;
+      max-width: 75%;
+      position: relative;
+      padding: 10px;
+    }
+    .message.received {
+      background: #f1f1f1;
+      color: #333;
+      border-radius: 10px 10px 10px 0;
+    }
+    .message.sent {
+      background: linear-gradient(90deg, #6dd5ed 0%, #2193b0 100%); /* xanh ngọc nhạt chuyển xanh biển */
+      color: #fff;
+      border-radius: 10px 10px 0 10px;
+      margin-left: auto;
+    }
+    .message-meta {
+      display: block;
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 4px;
+      text-align: right;
+    }
+    /* Thanh nhập và nút gửi */
+    .message-input textarea.form-control {
+      height: 38px;
+      min-height: 38px;
+      max-height: 38px;
+      border-radius: 20px 0 0 20px;
+      padding: 8px 15px;
+      resize: none;
+      overflow: hidden; /* Ẩn thanh cuộn */
+    }
+    .message-input button {
+      height: 38px;
+      border-radius: 0 20px 20px 0;
+      padding: 0 15px;
+      font-size: 1.1em;
+    }
+  </style>
 </head>
 <body>
-    <!-- Header -->
+	<!-- Header -->
     <div class="header">
         <div class="container-fluid">
             <div class="row align-items-center py-3">
-                <!-- Logo/Trang chủ -->
                 <div class="col-md-3">
                     <a href="<c:url value='/dashboard'/>" class="text-decoration-none">
                         <h4 class="mb-0 text-primary">
@@ -87,54 +88,23 @@
                         </h4>
                     </a>
                 </div>
-                
-                <!-- Ô tìm kiếm -->
                 <div class="col-md-6">
                     <form action="<c:url value='/dashboard'/>" method="get" class="d-flex justify-content-center">
                         <div class="input-group search-box">
-                            <input type="text" name="search" class="form-control" 
-                                   placeholder="Tìm kiếm người dùng..." 
-                                   value="${searchKeyword}">
+                            <input type="text" name="search" class="form-control" placeholder="Tìm kiếm người dùng...">
                             <button class="btn btn-outline-primary" type="submit">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </form>
                 </div>
-                
-                <!-- User info -->
-                <div class="col-md-3">
-                    <div class="d-flex justify-content-end">
-                        <div class="user-dropdown">
-                            <div class="d-flex align-items-center cursor-pointer" onclick="toggleDropdown()">
-                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : '/assets/images/default-avatar.png'}" 
-                                     alt="Avatar" class="avatar me-2">
-                                <span class="me-2">${currentUser.fullName}</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="dropdown-menu" id="userDropdown">
-                                <a href="<c:url value='/profile'/>" class="dropdown-item">
-                                    <i class="fas fa-user me-2"></i>Trang cá nhân
-                                </a>
-                                <a href="<c:url value='/profile/settings'/>" class="dropdown-item">
-                                    <i class="fas fa-cog me-2"></i>Chỉnh sửa thông tin
-                                </a>
-                                <a href="<c:url value='/logout'/>" class="dropdown-item">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
-
-    <!-- Main Content -->
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Left Sidebar - Gợi ý người dùng -->
-            <div class="col-md-3">
+  <div class="container mt-4">
+    <div class="row">
+      <!-- Sidebar trái (nếu có) -->
+      <div class="col-md-3">
                 <div class="sidebar">
                     <h5 class="mb-3">
                         <i class="fas fa-users"></i> Gợi ý theo dõi
@@ -163,175 +133,147 @@
                         </div>
                     </c:forEach>
                 </div>
-            </div>
+      </div>
 
-            <!-- Main Content Area -->
-            <div class="col-md-6">
-                <div class="main-content">
-                    <div class="post-form">
-                        <h5 class="mb-3">
-                            <i class="fas fa-comments"></i> Phòng Chat: ${room.name}
-                        </h5>
-                        <div class="chat-box" id="chatBox">
-                            <!-- Chat messages will be loaded here -->
-                            <div class="message received">
-                                <p>Chào mừng đến với phòng chat!</p>
-                                <span class="message-meta">StudyMate Bot - <fmt:formatDate value="<%= new java.util.Date() %>" pattern="HH:mm"/></span>
-                            </div>
-                        </div>
-                        <div class="message-input">
-                            <div class="input-group">
-                                <textarea id="chatMessage" class="form-control" rows="1" placeholder="Nhập tin nhắn..."></textarea>
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button" onclick="sendMessage(${room.roomId})">
-                                        <i class="fas fa-paper-plane"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <!-- Khu vực Chat chính -->
+      <div class="col-md-6">
+        <h5 class="mb-3">
+          <i class="fas fa-comments"></i>
+          Phòng Chat: ${room.name}
+        </h5>
 
-            <!-- Right Sidebar - Features -->
-            <div class="col-md-3">
+        <!-- Chat messages -->
+        <div class="chat-box" id="chatBox">
+          <div class="message received">
+            <p>Chào mừng đến với phòng chat!</p>
+            <span class="message-meta">
+              <fmt:formatDate value="${now}" pattern="HH:mm"/>
+            </span>
+          </div>
+          <!-- Tin nhắn mới sẽ được append ở đây -->
+        </div>
+
+        <!-- Thanh nhập tin -->
+        <div class="message-input d-flex align-items-center mt-2">
+          <textarea
+            id="chatMessage"
+            class="form-control flex-grow-1 me-2"
+            rows="1"
+            placeholder="Nhập tin nhắn..."
+          ></textarea>
+          <button
+            id="sendBtn"
+            class="btn btn-primary d-flex align-items-center justify-content-center"
+            type="button"
+            onclick="sendMessage(${room.roomId})"
+          >
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar phải (nếu có) -->
+      <div class="col-md-3">
                 <div class="right-sidebar">
-                    <h5 class="mb-3">
-                        <i class="fas fa-tools"></i> Tính năng
-                    </h5>
+                    <h5 class="mb-3"><i class="fas fa-tools"></i> Tính năng</h5>
                     
                     <!-- 1. Tạo lịch học -->
-                    <div class="feature-card">
-                        <a href="#" style="text-decoration: none; color: inherit; display: block; padding: 15px;">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-calendar-alt text-primary fa-2x me-3"></i>
-                                <div>
-                                    <h6 class="mb-1">Tạo lịch học</h6>
-                                    <small class="text-muted">Lên kế hoạch học tập</small>
-                                </div>
+                    <div class="feature-card" onclick="window.location.href='<c:url value="/schedule"/>'">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-calendar-alt text-primary fa-2x me-3"></i>
+                            <div>
+                                <h6 class="mb-1">Tạo lịch học</h6>
+                                <small class="text-muted">Lên kế hoạch học tập</small>
                             </div>
-                        </a>
+                        </div>
                     </div>
                     
                     <!-- 2. Xem ghi chú -->
-                    <div class="feature-card">
-                        <a href="<c:url value='/notes'/>" style="text-decoration: none; color: inherit; display: block; padding: 15px;">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-sticky-note text-warning fa-2x me-3"></i>
-                                <div>
-                                    <h6 class="mb-1">Xem ghi chú</h6>
-                                    <small class="text-muted">Quản lý ghi chú cá nhân</small>
-                                </div>
+                    <div class="feature-card" onclick="window.location.href='<c:url value="/notes"/>'">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-sticky-note text-warning fa-2x me-3"></i>
+                            <div>
+                                <h6 class="mb-1">Xem ghi chú</h6>
+                                <small class="text-muted">Quản lý ghi chú cá nhân</small>
                             </div>
-                        </a>
-                    </div>
-
-                    <!-- 3. Đăng tải tài liệu học tập -->
-                    <div class="feature-card">
-                        <a href="<c:url value='/documents/upload'/>" style="text-decoration: none; color: inherit; display: block; padding: 15px;">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-upload text-info fa-2x me-3"></i>
-                                <div>
-                                    <h6 class="mb-1">Đăng tải tài liệu học tập</h6>
-                                    <small class="text-muted">Chia sẻ tài liệu với cộng đồng</small>
-                                </div>
-                            </div>
-                        </a>
+                        </div>
                     </div>
                     
-                    <!-- 4. Xem tài liệu đã tải lên -->
-                    <div class="feature-card">
-                        <a href="<c:url value='/documents'/>" style="text-decoration: none; color: inherit; display: block; padding: 15px;">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-book-open text-success fa-2x me-3"></i>
-                                <div>
-                                    <h6 class="mb-1">Xem tài liệu đã tải lên</h6>
-                                    <small class="text-muted">Duyệt và tìm kiếm tài liệu</small>
-                                </div>
+                    <!-- 3. Xem task -->
+                    <div class="feature-card" onclick="window.location.href='<c:url value="/tasks"/>'">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-list-check text-success fa-2x me-3"></i>
+                            <div>
+                                <h6 class="mb-1">Xem task</h6>
+                                <small class="text-muted">Theo dõi công việc</small>
                             </div>
-                        </a>
+                        </div>
                     </div>
-
-                     <!-- 5. Tạo phòng học -->
-                     <div class="feature-card">
-                        <a href="<c:url value='/rooms'/>" style="text-decoration: none; color: inherit; display: block; padding: 15px;">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-users text-danger fa-2x me-3"></i>
-                                <div>
-                                    <h6 class="mb-1">Phòng học</h6>
-                                    <small class="text-muted">Tham gia và tạo phòng học</small>
-                                </div>
+                    
+                    <!-- 4. Thư viện tài liệu -->
+                    <div class="feature-card" onclick="window.location.href='<c:url value="/documents"/>'">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-book-open text-info fa-2x me-3"></i>
+                            <div>
+                                <h6 class="mb-1">Thư viện tài liệu</h6>
+                                <small class="text-muted">Tài liệu học tập</small>
                             </div>
-                        </a>
+                        </div>
                     </div>
-
-                    <!-- 6. Thống kê học tập -->
-                    <div class="feature-card">
-                        <a href="#" style="text-decoration: none; color: inherit; display: block; padding: 15px;">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-chart-line text-secondary fa-2x me-3"></i>
-                                <div>
-                                    <h6 class="mb-1">Thống kê học tập</h6>
-                                    <small class="text-muted">Theo dõi tiến độ</small>
-                                </div>
+	                    
+                    <!-- 5. Nhóm học tập -->
+                    <div class="feature-card" onclick="window.location.href='<c:url value="/rooms"/>'">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-users text-primary fa-2x me-3"></i>
+                            <div>
+                                <h6 class="mb-1">Nhóm học tập</h6>
+                                <small class="text-muted">Tham gia nhóm học</small>
                             </div>
-                        </a>
+                        </div>
                     </div>
-
-                     <!-- 7. Nhắc nhở -->
-                     <div class="feature-card">
-                        <a href="#" style="text-decoration: none; color: inherit; display: block; padding: 15px;">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-bell text-info fa-2x me-3"></i>
-                                <div>
-                                    <h6 class="mb-1">Nhắc nhở</h6>
-                                    <small class="text-muted">Đặt nhắc nhở cho công việc</small>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+                    
+                    
                 </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="<c:url value='/assets/js/bootstrap.bundle.min.js'/>"></script>
-    <script src="${pageContext.request.contextPath}/resources/assets/js/dashboard.js"></script>
-    <script>
-        function toggleDropdown() {
-            document.getElementById("userDropdown").classList.toggle("show");
-        }
+  <script>
+    function sendMessage(roomId) {
+      const input = document.getElementById("chatMessage");
+      const text = input.value.trim();
+      if (!text) return;
 
-        window.onclick = function(event) {
-            if (!event.target.matches('.user-dropdown *' ) && !event.target.matches('.user-dropdown')) {
-                var dropdowns = document.getElementsByClassName("dropdown-menu");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
+      // Lấy timestamp hiện tại
+      const now = new Date();
+      const hh = now.getHours().toString().padStart(2, "0");
+      const mm = now.getMinutes().toString().padStart(2, "0");
+      const time = `${hh}:${mm}`;
 
-        function sendMessage(roomId) {
-            const messageInput = document.getElementById(`chatMessage`);
-            const messageContent = messageInput.value.trim();
-            if (messageContent === '') return;
+      // Tạo div tin nhắn mới
+      const chatBox = document.getElementById("chatBox");
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", "sent");
 
-            // For now, just append the message to the chat box
-            const chatBox = document.getElementById("chatBox");
-            const newMessageDiv = document.createElement('div');
-            newMessageDiv.classList.add('message', 'sent');
-            newMessageDiv.innerHTML = `<p>${messageContent}</p><span class="message-meta">Bạn - <fmt:formatDate value="<%= new java.util.Date() %>" pattern="HH:mm"/></span>`;
-            chatBox.appendChild(newMessageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            messageInput.value = '';
+      // Tạo <p> chứa nội dung
+      const p = document.createElement("p");
+      p.textContent = text;
+      msgDiv.appendChild(p);
 
-            // In a real application, you would send this message to the server via WebSocket or AJAX
-            console.log(`Sending message to room ${roomId}: ${messageContent}`);
-        }
-    </script>
+      // Tạo <span> chứa timestamp
+      const span = document.createElement("span");
+      span.classList.add("message-meta");
+      span.textContent = time;
+      msgDiv.appendChild(span);
+
+      // Append và scroll xuống cuối
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.value = "";
+
+      // TODO: Gửi AJAX/WebSocket lên server nếu cần
+      console.log(`Sending to room ${roomId}:`, text);
+    }
+  </script>
 </body>
 </html>

@@ -23,15 +23,42 @@
                         </h4>
                     </a>
                 </div>
+                
                 <div class="col-md-6">
                     <form action="<c:url value='/dashboard'/>" method="get" class="d-flex justify-content-center">
                         <div class="input-group search-box">
-                            <input type="text" name="search" class="form-control" placeholder="Tìm kiếm người dùng...">
+                            <input type="text" name="search" class="form-control" 
+                                   placeholder="Tìm kiếm người dùng..." 
+                                   value="${searchKeyword}">
                             <button class="btn btn-outline-primary" type="submit">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </form>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="d-flex justify-content-end">
+                        <div class="user-dropdown">
+                            <div class="d-flex align-items-center cursor-pointer" onclick="toggleDropdown()">
+                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : 'resources/assets/images/avatar.png'}" 
+                                     alt="Avatar" class="avatar me-2">
+                                <span class="me-2">${currentUser.fullName}</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="dropdown-menu" id="userDropdown">
+                                <a href="<c:url value='/profile'/>" class="dropdown-item">
+                                    <i class="fas fa-user me-2"></i>Trang cá nhân
+                                </a>
+                                <a href="<c:url value='/profile/settings'/>" class="dropdown-item">
+                                    <i class="fas fa-cog me-2"></i>Chỉnh sửa thông tin
+                                </a>
+                                <a href="<c:url value='/logout'/>" class="dropdown-item">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -92,21 +92,26 @@
                         </h4>
                     </a>
                 </div>
+                
                 <div class="col-md-6">
                     <form action="<c:url value='/dashboard'/>" method="get" class="d-flex justify-content-center">
                         <div class="input-group search-box">
-                            <input type="text" name="search" class="form-control" placeholder="Tìm kiếm người dùng...">
+                            <input type="text" name="search" class="form-control" 
+                                   placeholder="Tìm kiếm người dùng..." 
+                                   value="${searchKeyword}">
                             <button class="btn btn-outline-primary" type="submit">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </form>
                 </div>
+                
                 <div class="col-md-3">
                     <div class="d-flex justify-content-end">
                         <div class="user-dropdown">
                             <div class="d-flex align-items-center cursor-pointer" onclick="toggleDropdown()">
-                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : '/assets/images/default-avatar.png'}" alt="Avatar" class="avatar me-2">
+                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : 'resources/assets/images/avatar.png'}" 
+                                     alt="Avatar" class="avatar me-2">
                                 <span class="me-2">${currentUser.fullName}</span>
                                 <i class="fas fa-chevron-down"></i>
                             </div>
@@ -178,7 +183,9 @@
                                         <div class="doc-title mb-1"><i class="fas fa-file-alt text-purple me-2"></i>${doc.title}</div>
                                         <div class="doc-meta mb-2">${doc.description}</div>
                                         <div class="mb-2">
-                                            <a class="doc-link" href="${doc.fileUrl}" target="_blank"><i class="fas fa-download me-1"></i>Tải/Xem tài liệu</a>
+                                            <a class="doc-link" href="${pageContext.request.contextPath}/documents/download?path=${doc.fileUrl}" target="_blank">
+											    <i class="fas fa-download me-1"></i>Tải/Xem tài liệu
+											</a>
                                         </div>
                                         <div class="doc-meta">
                                             <i class="fas fa-calendar-alt me-1"></i> ${doc.uploadedAt}
