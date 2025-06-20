@@ -37,27 +37,7 @@
                 </div>
                 <div class="col-md-6"></div>
                 <div class="col-md-3">
-                    <div class="d-flex justify-content-end">
-                        <div class="user-dropdown">
-                            <div class="d-flex align-items-center cursor-pointer" onclick="toggleDropdown()">
-                                <img src="${currentUser.avatarUrl != null ? currentUser.avatarUrl : '/assets/images/default-avatar.png'}" 
-                                     alt="Avatar" class="avatar me-2">
-                                <span class="me-2">${currentUser.fullName}</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="dropdown-menu" id="userDropdown">
-                                <a href="<c:url value='/profile'/>" class="dropdown-item">
-                                    <i class="fas fa-user me-2"></i>Trang cá nhân
-                                </a>
-                                <a href="<c:url value='/profile/settings'/>" class="dropdown-item">
-                                    <i class="fas fa-cog me-2"></i>Chỉnh sửa thông tin
-                                </a>
-                                <a href="<c:url value='/logout'/>" class="dropdown-item">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -70,26 +50,7 @@
             <div class="col-md-3">
                 <div class="sidebar">
                     <h5 class="mb-3"><i class="fas fa-users"></i> Gợi ý theo dõi</h5>
-                    <c:forEach var="suggestion" items="${suggestions}">
-                        <div class="suggestion-card">
-                            <div class="d-flex align-items-center">
-                                <img src="${suggestion.avatarUrl != null ? suggestion.avatarUrl : '/assets/images/default-avatar.png'}" 
-                                     alt="Avatar" class="avatar me-3">
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">${suggestion.fullName}</h6>
-                                    <small class="text-muted">@${suggestion.username}</small>
-                                </div>
-                            </div>
-                            <div class="mt-2">
-                                <button class="btn btn-primary btn-sm me-2" onclick="followUser(${suggestion.userId})">
-                                    <i class="fas fa-plus"></i> Theo dõi
-                                </button>
-                                <a href="<c:url value='/profile/${suggestion.userId}'/>" class="btn btn-outline-secondary btn-sm">
-                                    Xem trang
-                                </a>
-                            </div>
-                        </div>
-                    </c:forEach>
+                    
                 </div>
             </div>
 

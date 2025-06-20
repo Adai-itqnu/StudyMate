@@ -87,11 +87,6 @@ public class PostDaoImpl implements PostDao {
             conn = DBConnectionUtil.getConnection();
             conn.setAutoCommit(false); // Bắt đầu transaction
             
-            // Bước 1: Xóa shares (nếu có foreign key constraint)
-            try (PreparedStatement psShares = conn.prepareStatement("DELETE FROM shares WHERE post_id = ?")) {
-                psShares.setInt(1, postId);
-                psShares.executeUpdate();
-            }
             
             // Bước 2: Xóa comments (nếu có foreign key constraint) 
             try (PreparedStatement psComments = conn.prepareStatement("DELETE FROM comments WHERE post_id = ?")) {
@@ -151,7 +146,7 @@ public class PostDaoImpl implements PostDao {
     @Override
     public Post findById(int postId) {
         Post post = null;
-        String sql = "SELECT * FROM posts WHERE id = ?";
+        String sql = "SELECT * FROM posts WHERE post_id = ?";
         
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

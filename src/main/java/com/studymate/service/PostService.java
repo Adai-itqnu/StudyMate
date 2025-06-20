@@ -19,5 +19,6 @@ public interface PostService {
     /** Xóa post và tất cả dữ liệu con (attachments, likes, comments, shares) */
     void delete(int postId) throws Exception;
     
-    Post findById(int postId);
+    Post findById(int postId) throws Exception;
+
 }

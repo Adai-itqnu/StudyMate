@@ -128,12 +128,7 @@
                                     <span>💬</span>
                                     <span>${post.commentCount} bình luận</span>
                                 </div>
-                                <c:if test="${not empty post.shares}">
-                                    <div class="stat-item">
-                                        <span>🔄</span>
-                                        <span>${post.shares.size()} lượt chia sẻ</span>
-                                    </div>
-                                </c:if>
+                               
                             </div>
                         </div>
                     </c:forEach>

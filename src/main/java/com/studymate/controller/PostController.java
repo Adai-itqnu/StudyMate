@@ -13,6 +13,7 @@ import com.studymate.service.impl.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -232,9 +233,6 @@ public class PostController {
         return getRedirectUrl(redirectPage, request) + "#post-" + postId;
     }
 
-
-
-
     @PostMapping("/follow")
     public String followUser(
         @RequestParam int userId, 
@@ -322,4 +320,78 @@ public class PostController {
                 return "redirect:/dashboard";
         }
     }
+    
+    @PostMapping("/delete/{postId}")
+    public String deletePost(
+        @PathVariable int postId,
+        HttpSession session,
+        RedirectAttributes redirectAttributes
+    ) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return "redirect:/login";
+            }
+
+            // Kiểm tra quyền xóa bài viết
+            Post post = postService.findById(postId);
+            if (post == null) {
+                redirectAttributes.addFlashAttribute("error", "Không tìm thấy bài viết");
+                return "redirect:/profile";
+            }
+
+            if (post.getUserId() != currentUser.getUserId() && !currentUser.getRole().equals("ADMIN")) {
+                redirectAttributes.addFlashAttribute("error", "Bạn không có quyền xóa bài viết này");
+                return "redirect:/profile";
+            }
+
+            postService.delete(postId);
+            redirectAttributes.addFlashAttribute("message", "Đã xóa bài viết thành công");
+            
+        } catch (Exception e) {
+            System.err.println("ERROR in deletePost: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi xóa bài viết: " + e.getMessage());
+        }
+        
+        return "redirect:/profile";
+    }
+
+    @GetMapping("/edit/{postId}")
+    public String editPost(
+        @PathVariable int postId,
+        HttpSession session,
+        Model model
+    ) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return "redirect:/login";
+            }
+
+            Post post = postService.findById(postId);
+            if (post == null) {
+                model.addAttribute("error", "Không tìm thấy bài viết");
+                return "error";
+            }
+
+            if (post.getUserId() != currentUser.getUserId() && !currentUser.getRole().equals("ADMIN")) {
+                model.addAttribute("error", "Bạn không có quyền sửa bài viết này");
+                return "error";
+            }
+
+            model.addAttribute("post", post);
+            model.addAttribute("currentUser", currentUser);
+            
+            return "edit-post"; // Tên JSP file để edit bài viết
+            
+        } catch (Exception e) {
+            System.err.println("ERROR in editPost: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            return "error";
+        }
+    }
+    
+    
 }

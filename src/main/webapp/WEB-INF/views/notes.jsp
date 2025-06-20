@@ -24,14 +24,7 @@
                     </a>
                 </div>
                 <div class="col-md-6">
-                    <form action="<c:url value='/dashboard'/>" method="get" class="d-flex justify-content-center">
-                        <div class="input-group search-box">
-                            <input type="text" name="search" class="form-control" placeholder="Tìm kiếm người dùng...">
-                            <button class="btn btn-outline-primary" type="submit">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
+                    
                 </div>
             </div>
         </div>
@@ -45,28 +38,7 @@
                         <i class="fas fa-users"></i> Gợi ý theo dõi
                     </h5>
                     
-                    <c:forEach var="suggestion" items="${suggestions}">
-                        <div class="suggestion-card">
-                            <div class="d-flex align-items-center">
-                                <img src="${suggestion.avatarUrl != null ? suggestion.avatarUrl : '/assets/images/default-avatar.png'}" 
-                                     alt="Avatar" class="avatar me-3">
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">${suggestion.fullName}</h6>
-                                    <small class="text-muted">@${suggestion.username}</small>
-                                </div>
-                            </div>
-                            <div class="mt-2">
-                                <button class="btn btn-primary btn-sm me-2" 
-                                        onclick="followUser(${suggestion.userId})">
-                                    <i class="fas fa-plus"></i> Theo dõi
-                                </button>
-                                <a href="<c:url value='/profile/${suggestion.userId}'/>" 
-                                   class="btn btn-outline-secondary btn-sm">
-                                    Xem trang
-                                </a>
-                            </div>
-                        </div>
-                    </c:forEach>
+                    
                 </div>
             </div>
             <!-- Main Content Area: Ghi chú -->

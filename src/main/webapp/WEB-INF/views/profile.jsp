@@ -14,83 +14,7 @@
     </title>
     <link href="<c:url value='/assets/css/bootstrap.min.css'/>" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
-    <style>
-        .profile-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem 0;
-        }
-        .profile-avatar {
-            position: relative;
-        }
-        .profile-avatar img, .profile-avatar .avatar-placeholder {
-            border: 4px solid white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .info-card {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border: none;
-            border-radius: 10px;
-        }
-        .info-item {
-            padding: 1rem 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .info-item:last-child {
-            border-bottom: none;
-        }
-        .info-label {
-            font-weight: 600;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        .info-value {
-            color: #495057;
-            margin-top: 0.25rem;
-        }
-        .empty-value {
-            color: #adb5bd;
-            font-style: italic;
-        }
-        .follow-stats {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            display: block;
-        }
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-        .post-card {
-            border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-        }
-        .post-actions button {
-            border: none;
-            background: none;
-            color: #6c757d;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-        .post-actions button:hover {
-            background-color: #f8f9fa;
-            color: #495057;
-        }
-        .post-actions button.liked {
-            color: #dc3545;
-        }
-    </style>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/assets/css/profile.css"/>
 </head>
 <body class="bg-light">
     <!-- Navigation -->
@@ -394,74 +318,66 @@
                             </c:when>
                             <c:otherwise>
                                 <c:forEach var="post" items="${userPosts}">
-                                    <div class="post-card card mb-3">
-                                        <div class="card-header d-flex justify-content-between align-items-center">
-                                            <div class="d-flex align-items-center">
-                                                <c:choose>
-                                                    <c:when test="${not empty profileUser.avatarUrl}">
-                                                        <img src="${profileUser.avatarUrl}" class="rounded-circle me-2" width="40" height="40" alt="Avatar"/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
-                                                            <i class="fas fa-user"></i>
-                                                        </div>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <div>
-                                                    <strong>${profileUser.fullName}</strong>
-                                                    <br>
-                                                    <small class="text-muted">
-                                                        <fmt:formatDate value="${post.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
-                                                    </small>
-                                                </div>
-                                            </div>
-                                            <c:if test="${isOwnProfile}">
-                                                <div class="dropdown">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                        <i class="fas fa-ellipsis-h"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit"></i> Chỉnh sửa</a></li>
-                                                        <li><a class="dropdown-item text-danger" href="#" onclick="deletePost(${post.postId})"><i class="fas fa-trash"></i> Xóa</a></li>
-                                                    </ul>
-                                                </div>
-                                            </c:if>
-                                        </div>
-                                        <div class="card-body">
-                                            <h6 class="card-title">${post.title}</h6>
-                                            <p class="card-text">${post.body}</p>
-                                            
-                                            <!-- Attachments -->
-                                            <c:if test="${not empty post.attachments}">
-                                                <div class="mb-3">
-                                                    <c:forEach var="attachment" items="${post.attachments}">
-                                                        <c:if test="${attachment.fileType == 'IMAGE'}">
-                                                            <img src="${attachment.fileUrl}" class="img-fluid rounded mb-2" style="max-height: 400px;" alt="Post Image"/>
-                                                        </c:if>
-                                                    </c:forEach>
-                                                </div>
-                                            </c:if>
-                                        </div>
-                                        <div class="card-footer">
-                                            <div class="post-actions d-flex justify-content-between align-items-center">
-                                                <div class="d-flex gap-3">
-                                                    <button class="btn-like" onclick="toggleLike(${post.postId})">
-                                                        <i class="fas fa-heart"></i> ${post.likeCount}
-                                                    </button>
-                                                    <button onclick="toggleComments(${post.postId})">
-                                                        <i class="fas fa-comment"></i> ${post.comments.size()}
-                                                    </button>
-                                                    <button onclick="sharePost(${post.postId})">
-                                                        <i class="fas fa-share"></i> ${post.shares.size()}
-                                                    </button>
-                                                </div>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-eye"></i> ${post.privacy}
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </c:forEach>
+    <div class="post-card card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <c:choose>
+                    <c:when test="${not empty profileUser.avatarUrl}">
+                        <img src="${profileUser.avatarUrl}" class="rounded-circle me-2" width="40" height="40" alt="Avatar"/>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+                <div>
+                    <strong>${profileUser.fullName}</strong>
+                    <br>
+                    <small class="text-muted">
+                        <fmt:formatDate value="${post.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                    </small>
+                </div>
+            </div>
+            <c:if test="${isOwnProfile}">
+                <form method="post" action="${pageContext.request.contextPath}/profile/post/delete/${post.postId}" 
+      onsubmit="return confirm('Xóa bài viết?')" style="display:inline;">
+    <button type="submit" class="btn btn-sm btn-outline-danger">
+        <i class="fas fa-trash"></i>
+    </button>
+</form>
+            </c:if>
+        </div>
+        <div class="card-body">
+            <h6 class="card-title">${post.title}</h6>
+            <p class="card-text">${post.body}</p>
+            <c:if test="${not empty post.attachments}">
+                <div class="mb-3">
+                    <c:forEach var="attachment" items="${post.attachments}">
+                        <c:if test="${attachment.fileType == 'IMAGE'}">
+                            <img src="${attachment.fileUrl}" class="img-fluid rounded mb-2" style="max-height: 400px;" alt="Post Image"/>
+                        </c:if>
+                    </c:forEach>
+                </div>
+            </c:if>
+        </div>
+        <div class="card-footer">
+            <div class="post-actions d-flex justify-content-between align-items-center">
+                <div class="d-flex gap-3">
+                    <button class="btn-like" onclick="toggleLike(${post.postId})">
+                        <i class="fas fa-heart"></i> ${post.likeCount}
+                    </button>
+                    <button onclick="toggleComments(${post.postId})">
+                        <i class="fas fa-comment"></i> ${post.comments.size()}
+                    </button>
+                </div>
+                <small class="text-muted">
+                    <i class="fas fa-eye"></i> ${post.privacy}
+                </small>
+            </div>
+        </div>
+    </div>
+</c:forEach>
                             </c:otherwise>
                         </c:choose>
                     </div>
@@ -472,7 +388,7 @@
         <!-- Quick Actions (chỉ hiển thị cho profile của chính mình) -->
         <c:if test="${isOwnProfile}">
             <div class="row">
-                <div class="col-12">
+                <div class="col-12">	
                     <div class="card info-card">
                         <div class="card-header bg-warning text-dark">
                             <h5 class="mb-0">
@@ -513,7 +429,75 @@
         </c:if>
     </div>
 
-    <script src="<c:url value='/assets/js/bootstrap.bundle.min.js'/>"></script>
-	<script src="${pageContext.request.contextPath}/resources/assets/js/profile.js"></script>
+
+    <script>
+    function deletePost(postId) {
+        if (confirm('Bạn có chắc muốn xóa bài viết này?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '${pageContext.request.contextPath}/profile/post/delete/' + postId;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+        function followUser(userId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '${pageContext.request.contextPath}/profile/follow/' + userId;
+            
+            const csrfToken = document.querySelector('meta[name="_csrf"]');
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_csrf';
+                csrfInput.value = csrfToken.getAttribute('content');
+                form.appendChild(csrfInput);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function unfollowUser(userId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '${pageContext.request.contextPath}/profile/unfollow/' + userId;
+            
+            const csrfToken = document.querySelector('meta[name="_csrf"]');
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_csrf';
+                csrfInput.value = csrfToken.getAttribute('content');
+                form.appendChild(csrfInput);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function toggleLike(postId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '${pageContext.request.contextPath}/profile/like/' + postId;
+            <c:if test="${not isOwnProfile}">
+                const profileUserIdInput = document.createElement('input');
+                profileUserIdInput.type = 'hidden';
+                profileUserIdInput.name = 'profileUserId';
+                profileUserIdInput.value = '${profileUser.userId}';
+                form.appendChild(profileUserIdInput);
+            </c:if>
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function toggleComments(postId) {
+            // Implement comment toggle functionality
+            console.log('Toggle comments for post:', postId);
+        }
+    </script>
+    
+        <script src="<c:url value='/assets/js/bootstrap.bundle.min.js'/>"></script>
 </body>
 </html>

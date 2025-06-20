@@ -9,87 +9,8 @@
     <title>Chỉnh sửa thông tin cá nhân - StudyMate</title>
     <link href="<c:url value='/assets/css/bootstrap.min.css'/>" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
-    <style>
-        .settings-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem 0;
-        }
-        .form-card {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-        }
-        .form-card .card-header {
-            background: linear-gradient(45deg, #007bff, #0056b3);
-            color: white;
-            border: none;
-            padding: 1.5rem;
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .form-label {
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 0.5rem;
-        }
-        .form-control, .form-select {
-            border-radius: 10px;
-            border: 2px solid #e9ecef;
-            padding: 0.75rem 1rem;
-            transition: all 0.3s ease;
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        }
-        .btn-custom {
-            border-radius: 25px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .btn-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .alert {
-            border-radius: 10px;
-            border: none;
-        }
-        .avatar-preview {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid #dee2e6;
-            object-fit: cover;
-        }
-        .avatar-placeholder {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid #dee2e6;
-            background-color: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
-        }
-        .password-section {
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-        }
-        .section-divider {
-            border: 0;
-            height: 2px;
-            background: linear-gradient(to right, transparent, #007bff, transparent);
-            margin: 2rem 0;
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/assets/css/profile_setting.css"/>
+   
 </head>
 <body class="bg-light">
     <!-- Navigation -->
