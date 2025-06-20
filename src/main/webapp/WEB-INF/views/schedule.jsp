@@ -161,9 +161,7 @@
                                                             <div>${schedule.startTime.toString().substring(0,5)} - ${schedule.endTime.toString().substring(0,5)}</div>
                                                             <div>Phòng: ${schedule.room}</div>
                                                             <div class="mt-2">
-                                                                <button class="btn btn-sm btn-warning" onclick="editSchedule(${schedule.scheduleId})">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
+                                                                
                                                                 <button class="btn btn-sm btn-danger" onclick="deleteSchedule(${schedule.scheduleId})">
                                                                     <i class="fas fa-trash"></i>
                                                                 </button>
@@ -185,9 +183,7 @@
                                                             <div>${schedule.startTime.toString().substring(0,5)} - ${schedule.endTime.toString().substring(0,5)}</div>
                                                             <div>Phòng: ${schedule.room}</div>
                                                             <div class="mt-2">
-                                                                <button class="btn btn-sm btn-warning" onclick="editSchedule(${schedule.scheduleId})">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
+                                                                
                                                                 <button class="btn btn-sm btn-danger" onclick="deleteSchedule(${schedule.scheduleId})">
                                                                     <i class="fas fa-trash"></i>
                                                                 </button>
@@ -209,9 +205,7 @@
                                                             <div>${schedule.startTime.toString().substring(0,5)} - ${schedule.endTime.toString().substring(0,5)}</div>
                                                             <div>Phòng: ${schedule.room}</div>
                                                             <div class="mt-2">
-                                                                <button class="btn btn-sm btn-warning" onclick="editSchedule(${schedule.scheduleId})">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
+                                                                
                                                                 <button class="btn btn-sm btn-danger" onclick="deleteSchedule(${schedule.scheduleId})">
                                                                     <i class="fas fa-trash"></i>
                                                                 </button>
