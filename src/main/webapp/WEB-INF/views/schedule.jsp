@@ -107,13 +107,13 @@
                                 <div class="col-md-4 mb-3">
                                     <select name="dayOfWeek" class="form-control" required>
                                         <option value="">Chọn thứ</option>
-                                        <option value="1">Chủ nhật</option>
-                                        <option value="2">Thứ 2</option>
-                                        <option value="3">Thứ 3</option>
-                                        <option value="4">Thứ 4</option>
-                                        <option value="5">Thứ 5</option>
-                                        <option value="6">Thứ 6</option>
-                                        <option value="7">Thứ 7</option>
+                                        <option value="1">Thứ 2</option>
+                                        <option value="2">Thứ 3</option>
+                                        <option value="3">Thứ 4</option>
+                                        <option value="4">Thứ 5</option>
+                                        <option value="5">Thứ 6</option>
+                                        <option value="6">Thứ 7</option>
+                                        <option value="7">chủ nhật</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3 mb-3">

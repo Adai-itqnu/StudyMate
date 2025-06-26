@@ -75,7 +75,7 @@
                                 <c:forEach var="member" items="${members}">
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         <div class="d-flex align-items-center">
-                                            <img src="${member.avatarUrl != null ? member.avatarUrl : '/assets/images/default-avatar.png'}" 
+                                            <img src="${result.avatarUrl != null ? result.avatarUrl : 'resources/assets/images/avatar.png'}"
                                                  alt="Avatar" class="avatar me-3">
                                             <div>
                                                 <h6 class="mb-1">${member.fullName}</h6>
